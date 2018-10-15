@@ -1,9 +1,25 @@
-import * as PIXI from 'pixi.js';
-import {User} from './models/user.model';
+import {PXUI} from "./decorators/decorators";
+import {PanelModule} from "./panel.module";
 
-const q = new User();
-const sd = new PIXI.filters.BlurFilter();
+@PXUI({
+  settings: {
+    width: 'auto',
+    height: 'auto',
+    backgroundColor: 0x1099bb,
+  },
+  modules: [
+    {
+      module: PanelModule,
+      params: {},
+      prop: 'panelModule',
+    }
+  ],
+})
+export class PixiApp {
 
-console.log(q);
-console.log(sd.blur);
-console.log('pixi.js =>>>>', sd);
+  private panelModule: PanelModule;
+
+  constructor() {
+  }
+
+}
