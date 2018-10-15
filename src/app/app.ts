@@ -1,5 +1,5 @@
 import {PXUI} from "./decorators/decorators";
-import {PanelModule} from "./panel.module";
+import {PanelElement} from "./panel.element";
 
 @PXUI({
   settings: {
@@ -10,15 +10,15 @@ import {PanelModule} from "./panel.module";
   modules: [
     {
       route: '/',
-      module: PanelModule,
+      module: PanelElement,
       params: {},
-      prop: 'panelModule',
+      prop: 'panelElement',
     }
   ],
 })
 export class PixiApp {
 
-  private panelModule: PanelModule;
+  private panelElement: PanelElement;
 
   constructor() {
   }

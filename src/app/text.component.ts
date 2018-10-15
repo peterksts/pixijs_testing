@@ -1,5 +1,4 @@
-import * as PIXI from 'pixi.js';
-import {PXComponent} from "./interfaces/PIXIUI.interfaces";
+import {PXComponent, PXElement} from "./interfaces/pxui.interfaces";
 import {Component} from "./decorators/decorators";
 
 @Component({
@@ -9,28 +8,14 @@ import {Component} from "./decorators/decorators";
     'speed': 'speed',
   },
 })
-export class TextComponent extends PXComponent {
+export class TextComponent implements PXComponent {
 
-  public basicText: PIXI.Text;
-  public startY: number = 20;
-  public startX: number = 20;
-  public speed: number = 0.2;
-  set text(text: string) {
-    this.basicText.text = text;
-  }
-
-  constructor() { super(); }
+  readonly interference: PXElement;
 
   pxOnInit(): void {
-    this.basicText = new PIXI.Text('1');
-    this.x = this.startX;
-    this.y = this.startY;
-
-    this.addChild(this.basicText);
   }
 
   pxOnUpdate(): void {
-    this.x += this.speed;
   }
 
 }

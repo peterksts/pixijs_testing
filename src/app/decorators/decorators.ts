@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js';
-import {ComponentData, ModuleData, PXUIData} from "./models";
+import {ComponentData, ElementData, PXUIData} from "./models";
 
 let APP: PIXI.Application;
 let Settings = {
@@ -15,13 +15,18 @@ function hide(component: any): void {
   APP.stage.removeChild(component);
 }
 
-export function Module(data: ModuleData) {
+export function Element(data: ElementData) {
   return function (target: any): any {
     const comp = [];
     if (data.components) {
       data.components.forEach(component => {
         const newComp = new (<any>component.component)();
-        newComp.__pxAddParams(component.params);
+        for (const field in newComp.prototype.__pxParamsMap) {
+          if (component.params[field]) {
+            newComp[newComp.prototype.__pxParamsMap[field]] = component.params[field];
+          }
+        }
+        newComp.interference = target;
         comp.push(newComp);
 
         if (component.prop) {

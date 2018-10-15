@@ -1,6 +1,6 @@
 import ApplicationOptions = PIXI.ApplicationOptions;
 
-export interface ModuleData {
+export interface ElementData {
   components?: {
     component: Function,
     params?: {[key: string]: any},
@@ -27,8 +27,4 @@ export interface PXUIData {
     params: {[key: string]: any},
     prop?: string,
   }[];
-}
-
-export interface OnInit {
-  onInit(): void;
 }
