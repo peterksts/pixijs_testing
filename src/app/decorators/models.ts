@@ -22,8 +22,9 @@ export interface PXUIData {
     sharedLoader?: boolean
   }
   modules?: {
+    route: string,
     module: Function,
-    params?: {[key: string]: any},
+    params: {[key: string]: any},
     prop?: string,
   }[];
 }

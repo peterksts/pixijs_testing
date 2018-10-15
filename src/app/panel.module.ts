@@ -8,16 +8,16 @@ import {TextComponent} from "./text.component";
       prop: 'textComponent',
       component: TextComponent,
       params: {
-        'startX': 50,
-        'startY': 50,
+        'x': 50,
+        'y': 50,
       },
     },
     {
       prop: 'text1Component',
       component: TextComponent,
       params: {
-        'startX': 10,
-        'startY': 10,
+        'x': 10,
+        'y': 10,
         'speed': 0.1,
       },
     },
@@ -25,8 +25,8 @@ import {TextComponent} from "./text.component";
       prop: 'text2Component',
       component: TextComponent,
       params: {
-        'startX': 30,
-        'startY': 30,
+        'x': 30,
+        'y': 30,
         'speed': 0.25,
       },
     }

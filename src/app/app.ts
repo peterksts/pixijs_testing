@@ -9,6 +9,7 @@ import {PanelModule} from "./panel.module";
   },
   modules: [
     {
+      route: '/',
       module: PanelModule,
       params: {},
       prop: 'panelModule',

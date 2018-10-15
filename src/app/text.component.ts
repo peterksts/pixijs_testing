@@ -4,8 +4,8 @@ import {Component} from "./decorators/decorators";
 
 @Component({
   params: {
-    'startY': 'startY',
-    'startX': 'startX',
+    'y': 'startY',
+    'x': 'startX',
     'speed': 'speed',
   },
 })
