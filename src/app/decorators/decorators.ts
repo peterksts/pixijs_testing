@@ -21,9 +21,9 @@ export function Element(data: ElementData) {
     if (data.components) {
       data.components.forEach(component => {
         const newComp = new (<any>component.component)();
-        for (const field in newComp.prototype.__pxParamsMap) {
+        for (const field in newComp.__pxParamsMap) {
           if (component.params[field]) {
-            newComp[newComp.prototype.__pxParamsMap[field]] = component.params[field];
+            newComp[newComp.__pxParamsMap[field]] = component.params[field];
           }
         }
         newComp.interference = target;
