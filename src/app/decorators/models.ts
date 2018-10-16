@@ -6,6 +6,7 @@ export interface ElementData {
     params?: {[key: string]: any},
     prop?: string,
   }[];
+  params?: {[key: string]: string},
 }
 
 export interface ComponentData {
@@ -27,4 +28,8 @@ export interface PXUIData {
     params: {[key: string]: any},
     prop?: string,
   }[];
+}
+
+export enum AnchorEnum {
+  Top,
 }

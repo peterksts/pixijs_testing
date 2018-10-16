@@ -5,6 +5,7 @@ import {TextComponent} from "./text.component";
 @Element({
   components: [
     {
+      prop: 'text',
       component: TextComponent,
       params: {
         'x': 50,
@@ -12,6 +13,9 @@ import {TextComponent} from "./text.component";
       },
     },
   ],
+  params: {
+    'anchor': 'anchor',
+  }
 })
 export class PanelElement extends PXElement {
 

@@ -1,8 +1,21 @@
 import * as PIXI from "pixi.js";
+import {AnchorEnum} from "../decorators/models";
 
 export class PXElement extends PIXI.Container {
 
   private __pxComponents: Array<PXComponent>;
+  private __pxAnchor = {
+    x: 0,
+    y: 0,
+    position: AnchorEnum.Top, // default
+  };
+
+  set anchor(anchor: AnchorEnum) {
+  }
+
+  get anchor(): AnchorEnum {
+    return this.__pxAnchor.position;
+  }
 
   constructor() {
     super();
