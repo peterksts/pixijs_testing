@@ -1,12 +1,24 @@
 import ApplicationOptions = PIXI.ApplicationOptions;
+import InteractionEventTypes = PIXI.interaction.InteractionEventTypes;
 
-export interface ElementData {
+export interface SettingsElement {
+  autoInitComponentsOff?: boolean;
+  autoInitElementsOff?: boolean;
+}
+
+export interface ElementMetadata {
   components?: {
     component: Function,
     params?: {[key: string]: any},
     prop?: string,
   }[];
+  elements?: {
+    element: Function,
+    params?: {[key: string]: any},
+    prop?: string,
+  }[];
   params?: {[key: string]: string},
+  settings?: SettingsElement,
 }
 
 export interface ComponentData {
@@ -33,3 +45,5 @@ export interface PXUIData {
 export enum AnchorEnum {
   Top,
 }
+
+export type EventTypes = InteractionEventTypes | 'scroll';

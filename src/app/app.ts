@@ -1,5 +1,5 @@
 import {PXUI} from "./decorators/decorators";
-import {PanelElement} from "./panel.element";
+import {PanelElement} from "./elements/panel/panel.element";
 
 @PXUI({
   settings: {
