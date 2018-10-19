@@ -1,31 +1,33 @@
 import ApplicationOptions = PIXI.ApplicationOptions;
 import InteractionEventTypes = PIXI.interaction.InteractionEventTypes;
 
+export interface ComponentData {
+  component: Function,
+  params?: {[key: string]: any},
+  prop?: string,
+}
+
+export interface ElementData {
+  element: Function,
+  params?: {[key: string]: any},
+  prop?: string,
+}
+
 export interface SettingsElement {
-  autoInitComponentsOff?: boolean;
-  autoInitElementsOff?: boolean;
 }
 
 export interface ElementMetadata {
-  components?: {
-    component: Function,
-    params?: {[key: string]: any},
-    prop?: string,
-  }[];
-  elements?: {
-    element: Function,
-    params?: {[key: string]: any},
-    prop?: string,
-  }[];
+  components?: ComponentData[];
+  elements?: ElementData[];
   params?: {[key: string]: string},
   settings?: SettingsElement,
 }
 
-export interface ComponentData {
+export interface ComponentMetadata {
   params?: {[key: string]: any}
 }
 
-export interface PXUIData {
+export interface PXUIMetadata {
   settings?: ApplicationOptions | {
     width?: number | 'auto',
     height?: number | 'auto',

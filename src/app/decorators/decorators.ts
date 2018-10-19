@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js';
-import {ComponentData, ElementMetadata, EventTypes, PXUIData} from "./models";
+import {ComponentMetadata, ElementMetadata, EventTypes, PXUIMetadata} from "./models";
 import InteractionEventTypes = PIXI.interaction.InteractionEventTypes;
 
 let APP: PIXI.Application;
@@ -16,27 +16,56 @@ function hide(component: any): void {
   APP.stage.removeChild(component);
 }
 
-function pushElOrComp(target, property, el) {
+export function pushElOrComp(object, property, el) {
   if (property) {
     if (/\[]$/.test(property)) {
       const prop = property.slice(0, property.length - 2);
-      if (Array.isArray(target.prototype[prop])) {
-        target.prototype[prop].push(el);
+      if (Array.isArray(object[prop])) {
+        object[prop].push(el);
       } else {
-        target.prototype[prop] = [el];
+        object[prop] = [el];
       }
     } else {
-      target.prototype[property] = el;
+      object[property] = el;
     }
   }
 }
 
-export function HostListener(typeEvent: EventTypes): any {
+export function pushParams(outgoing, incoming, params) {
+  params = params || {};
+  for (const field in incoming.__pxParamsMap) {
+    if (params[field]) {
+      let d = params[field];
+      if (d.includes && d.slice(0, 1) === '[' && d.slice(d.length - 1, d.length) === ']') { // '[prop]'
+        d = d.slice(1, d.length - 1);
+        Object.defineProperty(outgoing, d, {
+          set: function(v) {
+            outgoing['__pxParam' + d] = v;
+            if (incoming[incoming.__pxParamsMap[field]] !== v) {
+              incoming[incoming.__pxParamsMap[field]] = v;
+            }
+          },
+          get: function() {
+            return outgoing['__pxParam' + d];
+          },
+        });
+      } else if (d.includes && d.slice(0, 1) === '(' && d.slice(d.length - 1, d.length) === ')') { // '(prop)' || '(prop())'
+        d = d.slice(1, d.length - 1);
+        incoming[incoming.__pxParamsMap[field]].addListener(null, outgoing, d);
+      } else { // other
+        incoming[incoming.__pxParamsMap[field]] = d;
+      }
+    }
+  }
+}
+
+export function HostListener(... typeEvents: EventTypes[]): any {
   return function (target: any, propKey: string) {
-    // console.log(target.on);
-    // setTimeout(() => {
-    //   target.on(typeEvent, target[propKey]);
-    // }, 100);
+    const events = [];
+    typeEvents.forEach(type => {
+      events.push({event: type, fn: target[propKey]});
+    });
+    target.__pxEvents = events;
     return {};
   }
 }
@@ -49,40 +78,11 @@ export function Element(data: ElementMetadata) {
     ///////////
 
     // Components
-    const comp = [];
-    if (data.components) {
-      data.components.forEach(component => {
-        const newComp = new (<any>component.component)();
-        component.params = component.params || {};
-        for (const field in newComp.__pxParamsMap) {
-          if (component.params[field]) {
-            newComp[newComp.__pxParamsMap[field]] = component.params[field];
-          }
-        }
-        comp.push(newComp);
-        pushElOrComp(target, component.prop, newComp);
-      });
-    }
+    const comp = data.components || [];
     ////////////
 
     // Elements
-    const elem = [];
-    if (data.elements) {
-      data.elements.forEach(element => {
-        element.params = element.params || {};
-        const newElem = new (<any>element.element)();
-        for (const field in newElem.__pxParamsMap) {
-          if (element.params[field]) {
-            newElem[newElem.__pxParamsMap[field]] = element.params[field];
-          }
-        }
-        elem.push(newElem);
-        if (!settings.autoInitElementsOff) {
-          newElem.pxOnInit && newElem.pxOnInit();
-        }
-        pushElOrComp(target, element.prop, newElem);
-      });
-    }
+    const elem = data.elements || [];
     ////////////
 
     // Target
@@ -93,20 +93,43 @@ export function Element(data: ElementMetadata) {
     target.prototype.__pxSettings = settings;
     /////////
 
-    target.prototype.__pxComponents = comp;
-    target.prototype.__pxElements = elem;
+    target.prototype.__pxComponentClasses = comp;
+    target.prototype.__pxElementClasses = elem;
     return target;
   }
 }
 
-export function Component(data: ComponentData) {
+export function Component(data: ComponentMetadata) {
   return function(target: any) {
     target.prototype.__pxParamsMap = data.params || {};
+    target.prototype.__pxActive = true;
+    Object.defineProperty(target.prototype, 'pxActive', {
+      set: function(v) {
+        // TODO: Your code !
+        //
+
+        const change = this.__pxActive !== v;
+        this.__pxActive = v;
+
+        // Events:
+        if (change) {
+          if (this.__pxActive) {
+            this.pxOnShow();
+          } else {
+            this.pxOnHide();
+          }
+        }
+      },
+      get: function() {
+        return this.__pxActive;
+      },
+    });
+
     return target;
   };
 }
 
-export function PXUI(data: PXUIData) {
+export function PXUI(data: PXUIMetadata) {
   if (data.settings.height === 'auto') {
     data.settings.height = window.innerHeight;
     Settings.heightAuto = true;

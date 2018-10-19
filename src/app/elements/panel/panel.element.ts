@@ -11,14 +11,18 @@ export class PanelElement extends PXElement implements PXInit {
   public textList: TextComponent[];
 
   pxOnInit(): void {
-    const dom = new DomElement({
-      'position': {x: 300, y: 200},
-    });
-    dom.pxOnInit();
-    this.addChild(dom);
-    this.on("mousedown", () => {
-      console.log(11);
-    });
+    // const dom = new DomElement({
+    //   'position': {x: 300, y: 200},
+    // });
+    // dom.pxOnInit();
+    // this.addChild(dom);
+    this.addElement(DomElement, {
+      'position': {x: 300, y: 300},
+    })
+
+    // this.on("mousedown", () => {
+    //   console.log(11);
+    // });
   }
 
   @HostListener('mousedown')

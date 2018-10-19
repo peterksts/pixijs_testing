@@ -7,12 +7,14 @@ export const Metadata: ElementMetadata = {
   },
   components: [
     {
-      prop: 'textList',
+      prop: 'textComp',
       component: TextComponent,
       params: {
-        'x': 200,
         'y': 50,
         'text': 'Dom',
+        'speed': 0,
+        'x': '[textX]',
+        'changeX': '(textX)',
       },
     },
   ],
