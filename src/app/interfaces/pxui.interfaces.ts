@@ -1,4 +1,5 @@
 import * as PIXI from "pixi.js";
+import {Subscription} from 'rxjs';
 import {AnchorEnum, ComponentData, ElementData, EventTypes, SettingsElement} from "../decorators/models";
 import {pushElOrComp, pushParams} from "../decorators/decorators";
 import EventEmitter = PIXI.utils.EventEmitter;
@@ -6,6 +7,8 @@ import EventEmitter = PIXI.utils.EventEmitter;
 export class PXElement extends PIXI.Container {
 
   private __pxEvents: Array<{event: EventTypes; fn: Function}> = [];
+  private __pxSubjects: Array<{path: string; fn: Function}> = [];
+  private __pxSubscriptions: Array<Subscription> = [];
   private __pxComponentClasses: Array<ComponentData>;
   private __pxElementClasses: Array<ElementData>;
   private __pxSettings: SettingsElement;
@@ -27,7 +30,6 @@ export class PXElement extends PIXI.Container {
   constructor() {
     super();
     const obj = new PIXI.Container();
-    console.log(this);
     (<any>Object).assign(this, obj);
 
     this.__pxComponentClasses.forEach( comp => {
@@ -40,8 +42,12 @@ export class PXElement extends PIXI.Container {
       pushElOrComp(this, elem.prop, e);
     });
 
-    (<any>this).__proto__.__pxEvents.forEach(ev => {
+    (<any>this).__proto__.__pxEvents && (<any>this).__proto__.__pxEvents.forEach(ev => {
       this.addListener(<any>ev.event, <any>ev.fn);
+    });
+
+    (<any>this).__proto__.__pxSubjects && (<any>this).__proto__.__pxSubjects.forEach(sub => {
+      const path = sub.path.split('.');
     });
   }
 

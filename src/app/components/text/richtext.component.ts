@@ -4,7 +4,6 @@ import {TextElement} from "../../elements/text/text.element";
 
 @Component({
     params: {
-        'y': 'startY',
     },
 })
 export class RichTextComponent implements PXComponent {

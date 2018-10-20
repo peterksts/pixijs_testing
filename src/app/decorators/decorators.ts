@@ -58,18 +58,25 @@ export function pushParams(outgoing, incoming, params) {
   }
 }
 
-export function HostSubscription(subject: string): any {
+export function HostSubscription(... subjectPaths: string[]): any {
   return function (target: any, propKey: string) {
+    if (!Array.isArray(target.__pxSubjects)) {
+      target.__pxSubjects = [];
+    }
+    subjectPaths.forEach(path => {
+      target.__pxSubjects.push({path: path, fn: target[propKey]});
+    });
   }
 }
 
 export function HostListener(... typeEvents: EventTypes[]): any {
   return function (target: any, propKey: string) {
-    const events = [];
+    if (!Array.isArray(target.__pxEvents)) {
+      target.__pxEvents = [];
+    }
     typeEvents.forEach(type => {
-      events.push({event: type, fn: target[propKey]});
+      target.__pxEvents.push({event: type, fn: target[propKey]});
     });
-    target.__pxEvents = events;
     return {};
   }
 }

@@ -1,34 +1,26 @@
-import {Element, HostListener} from "../../decorators/decorators";
+import {Element, HostListener, HostSubscription} from '../../decorators/decorators';
 import {PXElement, PXInit} from "../../interfaces/pxui.interfaces";
 import {TextComponent} from "../../components/text/text.component";
 import {Metadata} from "./panel.metadata";
-import {DomElement} from "../dom/dom.element";
 import InteractionEvent = PIXI.interaction.InteractionEvent;
+import {Subject} from 'rxjs';
 
 @Element(Metadata)
 export class PanelElement extends PXElement implements PXInit {
 
   public textList: TextComponent[];
+  public sub = {su: new Subject<any>()};
 
   pxOnInit(): void {
-    // const dom = new DomElement({
-    //   'position': {x: 300, y: 200},
-    // });
-    // dom.pxOnInit();
-    // this.addChild(dom);
-    this.addElement(DomElement, {
-      'position': {x: 300, y: 300},
-    });
-    this.interactive = true;
-
-    // this.on("mousedown", () => {
-    //   console.log(11);
-    // });
   }
 
   @HostListener('mouseover')
   onMouseOver(event: InteractionEvent) {
-    console.log(1);
+  }
+
+  @HostSubscription('sub.su')
+  changeTask(data: any) {
+    console.log(data);
   }
 
 }

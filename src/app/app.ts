@@ -1,10 +1,7 @@
-import {APP, PXUI} from "./decorators/decorators";
+import {PXUI} from "./decorators/decorators";
 import {PanelElement} from "./elements/panel/panel.element";
-import {VoidWarp} from "./elements/void/void.warp";
-import {TextWarp} from "./elements/text/text.warp";
 import {VoidElement} from "./elements/void/void.element";
 import {TextElement} from "./elements/text/text.element";
-import {DomElement} from "./elements/dom/dom.element";
 import {RichTextComponent} from "./components/text/richtext.component";
 
 @PXUI({
@@ -14,17 +11,22 @@ import {RichTextComponent} from "./components/text/richtext.component";
         backgroundColor: 0x1099bb,
     },
     modules: [
-        {
-            route: '/',
-            prop: 'root',
-            module: VoidElement,
-            params: {}
-        }
+      {
+          route: '/',
+          prop: 'root',
+          module: VoidElement,
+          params: {}
+      },
+      {
+        route: '/',
+        module: PanelElement,
+        params: {}
+      },
     ],
 })
 export class PixiApp {
 
-    private root: PanelElement;
+    private root: VoidElement;
 
   constructor() {
     const obj: TextElement = this.root.addElement(TextElement, {

@@ -28,7 +28,6 @@ export class VoidWarp extends PIXI.Container {
     constructor() {
         super();
         const obj = new PIXI.Container();
-        console.log(this);
         (<any>Object).assign(this, obj);
 
         this.__pxComponentClasses.forEach( comp => {
@@ -41,7 +40,7 @@ export class VoidWarp extends PIXI.Container {
             pushElOrComp(this, elem.prop, e);
         });
 
-        (<any>this).__pxEvents.forEach(ev => {
+      (<any>this).__proto__.__pxEvents && (<any>this).__proto__.__pxEvents.forEach(ev => {
             this.addListener(<any>ev.event, <any>ev.fn);
         });
     }
