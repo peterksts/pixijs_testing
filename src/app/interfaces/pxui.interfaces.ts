@@ -37,19 +37,23 @@ export class PXElement extends PIXI.Container {
       const c = this.addComponent(comp.component, comp.params);
       pushElOrComp(this, comp.prop, c);
     });
+    delete this.__pxComponentClasses;
 
     this.__pxElementClasses.forEach( elem => {
       const e = this.addElement(elem.element, elem.params);
       pushElOrComp(this, elem.prop, e);
     });
+    delete this.__pxElementClasses;
 
     (<any>this).__proto__.__pxEvents && (<any>this).__proto__.__pxEvents.forEach(ev => {
       this.addListener(<any>ev.event, <any>ev.fn);
     });
+    delete (<any>this).__proto__.__pxEvents;
 
     (<any>this).__proto__.__pxSubjects && (<any>this).__proto__.__pxSubjects.forEach(sub => {
       this.__pxAddSubject(sub);
     });
+    delete (<any>this).__proto__.__pxSubjects;
   }
 
   private __pxAddSubject(sub: {path: string; fn: Function}) {
