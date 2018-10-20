@@ -54,18 +54,18 @@ export class PXElement extends PIXI.Container {
     });
   }
 
-  public addComponent(comp: PXComponent | any, params?: {[key: string]: any}): any {
+  public addComponent(comp: PXComponent | any, params?: {[key: string]: any}, outgoing?: PXElement | any): any {
     comp = new comp();
-    pushParams(this, comp, params);
+    pushParams(outgoing || this, comp, params);
     comp.interference = this;
     comp.pxOnInit();
     this.__pxComponents.push(comp);
     return comp;
   }
 
-  public addElement(elem: PXElement | any, params?: {[key: string]: any}): any {
+  public addElement(elem: PXElement | any, params?: {[key: string]: any}, outgoing?: PXElement | any): any {
     elem = new elem();
-    pushParams(this, elem, params);
+    pushParams(outgoing || this, elem, params);
     elem.pxOnInit && elem.pxOnInit();
     this.addChild(elem);
     return elem;

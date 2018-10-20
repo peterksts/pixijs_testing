@@ -1,6 +1,5 @@
 import * as PIXI from 'pixi.js';
 import {ComponentMetadata, ElementMetadata, EventTypes, PXUIMetadata} from "./models";
-import InteractionEventTypes = PIXI.interaction.InteractionEventTypes;
 
 let APP: PIXI.Application;
 let Settings = {
@@ -59,6 +58,11 @@ export function pushParams(outgoing, incoming, params) {
   }
 }
 
+export function HostSubscription(subject: string): any {
+  return function (target: any, propKey: string) {
+  }
+}
+
 export function HostListener(... typeEvents: EventTypes[]): any {
   return function (target: any, propKey: string) {
     const events = [];
@@ -105,14 +109,11 @@ export function Component(data: ComponentMetadata) {
     target.prototype.__pxActive = true;
     Object.defineProperty(target.prototype, 'pxActive', {
       set: function(v) {
-        // TODO: Your code !
-        //
-
-        const change = this.__pxActive !== v;
+        const isChange = this.__pxActive !== v;
         this.__pxActive = v;
 
         // Events:
-        if (change) {
+        if (isChange) {
           if (this.__pxActive) {
             this.pxOnShow();
           } else {

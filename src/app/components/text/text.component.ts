@@ -18,6 +18,7 @@ export class TextComponent implements PXComponent {
   public defaultText = 'Hello!';
   public speed = 0;
   public changeX = new PXEventEmitter<number>();
+
   set _startX(x) {
     if (this.text)  {
       this.text.x = x;

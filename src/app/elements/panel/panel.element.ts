@@ -18,15 +18,16 @@ export class PanelElement extends PXElement implements PXInit {
     // this.addChild(dom);
     this.addElement(DomElement, {
       'position': {x: 300, y: 300},
-    })
+    });
+    this.interactive = true;
 
     // this.on("mousedown", () => {
     //   console.log(11);
     // });
   }
 
-  @HostListener('mousedown')
-  onClick(event: InteractionEvent) {
+  @HostListener('mouseover')
+  onMouseOver(event: InteractionEvent) {
     console.log(1);
   }
 
