@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js';
 import {ComponentMetadata, ElementMetadata, EventTypes, PXUIMetadata} from "./models";
 
-let APP: PIXI.Application;
+export let APP: PIXI.Application;
 let Settings = {
   heightAuto: false,
   widthAuto: false,

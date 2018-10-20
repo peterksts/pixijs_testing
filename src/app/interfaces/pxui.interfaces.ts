@@ -74,7 +74,7 @@ export class PXElement extends PIXI.Container {
 }
 
 export interface PXComponent extends PXInit, PXUpdate, PXDestroy {
-  readonly interference: PXElement;
+  readonly interference: PIXI.Container;
   pxActive: boolean;
 
   pxOnHide(): void;
