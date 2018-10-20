@@ -1,7 +1,9 @@
 import * as PIXI from 'pixi.js';
-import {ComponentMetadata, ElementMetadata, EventTypes, PXUIMetadata} from "./models";
+import 'reflect-metadata'
+import {ComponentMetadata, ElementMetadata, EventTypes, ModuleMetadata, PXUIMetadata} from './models';
+import {LoaderService} from '../services/loader.service';
 
-export let APP: PIXI.Application;
+let APP: PIXI.Application;
 let Settings = {
   heightAuto: false,
   widthAuto: false,
@@ -58,7 +60,20 @@ export function pushParams(outgoing, incoming, params) {
   }
 }
 
-export function HostSubscription(... subjectPaths: string[]): any {
+export function Inject() {
+  return function (target: Object, propKey: string): any {
+    const propType = Reflect.getMetadata("design:type", target, propKey);
+    const descriptor = {
+      get: function () {
+        return (<any>target).__pxProviders[propType.name];
+      }
+    };
+    Object.defineProperty(target, propKey, descriptor);
+    return descriptor;
+  }
+}
+
+export function HostSubscription(... subjectPaths: string[]) {
   return function (target: any, propKey: string) {
     if (!Array.isArray(target.__pxSubjects)) {
       target.__pxSubjects = [];
@@ -66,10 +81,11 @@ export function HostSubscription(... subjectPaths: string[]): any {
     subjectPaths.forEach(path => {
       target.__pxSubjects.push({path: path, fn: target[propKey]});
     });
+    return {};
   }
 }
 
-export function HostListener(... typeEvents: EventTypes[]): any {
+export function HostListener(... typeEvents: EventTypes[]) {
   return function (target: any, propKey: string) {
     if (!Array.isArray(target.__pxEvents)) {
       target.__pxEvents = [];
@@ -78,6 +94,35 @@ export function HostListener(... typeEvents: EventTypes[]): any {
       target.__pxEvents.push({event: type, fn: target[propKey]});
     });
     return {};
+  }
+}
+
+export function Module(data: ModuleMetadata) {
+
+  return function (target: any): any {
+
+    // Provider
+    target.prototype['__pxProviders'] = {};
+    LoaderService.prototype['__pxProviders'] = target.prototype['__pxProviders'];
+    const loaderService = new LoaderService();
+    target.prototype['__pxProviders'][LoaderService.name] = loaderService;
+
+    data.provider && data.provider.forEach(provider => {
+      provider.prototype['__pxProviders'] = target.prototype['__pxProviders'];
+      target.prototype['__pxProviders'][provider.name] = new (<any>provider)();
+    });
+    ////////////
+
+    // Sprite
+    data.sprite && loaderService.loadByConfig(data.sprite);
+    ////////////
+
+    // element
+    (<any>data.element).element.prototype.__pxProviders = target.prototype['__pxProviders'];
+    target.prototype['__pxElement'] = new (<any>data.element.element)();
+    ////////////
+
+    return target;
   }
 }
 
@@ -162,7 +207,8 @@ export function PXUI(data: PXUIMetadata) {
   return function(target: any): any {
     if (data.modules) {
       data.modules.forEach(module => {
-        const newElem = new (<any>module.module)();
+        const newModule = new (<any>module.module)();
+        const newElem = newModule.__pxElement;
         show(newElem);
         newElem.pxOnInit && newElem.pxOnInit();
 
@@ -225,17 +271,4 @@ window.addEventListener('resize', () => {
 //   }
 // }
 //
-// export function Inject() {
-//   return function (target: Object, propKey: string): any {
-//     const propType = Reflect.getMetadata("design:type", target, propKey);
-//     const descriptor = {
-//       get: function () {
-//         return globalService.getService(propType);
-//       },
-//       set: function () {
-//       },
-//     };
-//     Object.defineProperty(target, propKey, descriptor);
-//     return descriptor;
-//   }
-// }
+

@@ -27,6 +27,12 @@ export interface ComponentMetadata {
   params?: {[key: string]: any}
 }
 
+export interface ModuleMetadata {
+  element: ElementData;
+  provider?: Function[];
+  sprite?: {[key: string]: string}; // Example: LogoTexture: 'assets/logo.svg'
+}
+
 export interface PXUIMetadata {
   settings?: ApplicationOptions | {
     width?: number | 'auto',
@@ -39,7 +45,7 @@ export interface PXUIMetadata {
   modules?: {
     route: string,
     module: Function,
-    params: {[key: string]: any},
+    params?: {[key: string]: any},
     prop?: string,
   }[];
 }

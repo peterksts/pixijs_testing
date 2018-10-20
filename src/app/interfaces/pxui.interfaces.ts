@@ -7,6 +7,7 @@ import EventEmitter = PIXI.utils.EventEmitter;
 export class PXElement extends PIXI.Container {
 
   private __pxEvents: Array<{event: EventTypes; fn: Function}> = [];
+  private __pxProviders: {[key: string]: any};
   private __pxSubjects: Array<{path: string; fn: Function}> = [];
   private __pxSubscriptions: Array<Subscription> = [];
   private __pxComponentClasses: Array<ComponentData>;
@@ -61,6 +62,7 @@ export class PXElement extends PIXI.Container {
   }
 
   public addComponent(comp: PXComponent | any, params?: {[key: string]: any}, outgoing?: PXElement | any): any {
+    comp.prototype.__pxProviders = (<any>this).__proto__.__pxProviders;
     comp = new comp();
     pushParams(outgoing || this, comp, params);
     comp.interference = this;
@@ -70,6 +72,7 @@ export class PXElement extends PIXI.Container {
   }
 
   public addElement(elem: PXElement | any, params?: {[key: string]: any}, outgoing?: PXElement | any): any {
+    elem.prototype.__pxProviders = (<any>this).__proto__.__pxProviders;
     elem = new elem();
     pushParams(outgoing || this, elem, params);
     elem.pxOnInit && elem.pxOnInit();
