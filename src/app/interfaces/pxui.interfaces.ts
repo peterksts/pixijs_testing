@@ -48,8 +48,20 @@ export class PXElement extends PIXI.Container {
     });
 
     (<any>this).__proto__.__pxSubjects && (<any>this).__proto__.__pxSubjects.forEach(sub => {
-      const path = sub.path.split('.');
+      this.__pxAddSubject(sub);
     });
+  }
+
+  private __pxAddSubject(sub: {path: string; fn: Function}) {
+    const path = sub.path.split('.');
+    let obj = this[path[0]];
+    for (let i = 1; i < path.length; i++) {
+      obj = obj[path[i]];
+      if (i === path.length - 1) { // end path
+        this.__pxSubscriptions.push(obj.asObservable().subscribe(sub.fn.bind(this)));
+        break;
+      }
+    }
   }
 
   private __pxComponentsUpdate(): void {
