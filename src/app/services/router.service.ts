@@ -97,7 +97,7 @@ export class RouterService {
   private page404(): void {
     let module = this.mapRouter['/404'];
     if (!module) {
-      module = this.mapModule['/404']();
+      module = new this.mapModule['/404']();
       this.mapRouter['/404'] = module;
     }
     if (!module.__pxIsInit) {

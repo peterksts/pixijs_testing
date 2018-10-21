@@ -2,11 +2,12 @@ import {PXComponent} from '../../interfaces/px-component.model';
 import {PXInterfaceComponent} from '../../interfaces/pxui.interfaces';
 import {Component, HostListener, HostSubscription, Inject} from '../../decorators/decorators';
 import {BranchService} from '../services/branch.service';
+import {RouterService} from '../../services/router.service';
 
 @Component({})
 export class ClickComponent extends PXComponent implements PXInterfaceComponent {
 
-  @Inject() private branchService: BranchService;
+  @Inject() private routerService: RouterService;
 
   pxOnInit(): void {
     this.interference.interactive = true;
@@ -27,12 +28,7 @@ export class ClickComponent extends PXComponent implements PXInterfaceComponent 
 
   @HostListener('mousedown')
   onClick() {
-    console.log('click');
-  }
-
-  @HostSubscription('branchService.branchChange')
-  changeBranch(data) {
-    console.log(data);
+    this.routerService.command('/home');
   }
 
 }
