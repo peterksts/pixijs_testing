@@ -125,7 +125,7 @@ export class PXEventEmitter<T> {
     this.eventEmitter.emit('all', data)
   }
 
-  addListener(func?: Function, object?: any, param?: string) { // param: 'build()' | 'build'
+  addListener(func?: (data: T) => void, object?: any, param?: string) { // param: 'build()' | 'build'
     if (func) {
       this.eventEmitter.addListener('all', func);
     } else {

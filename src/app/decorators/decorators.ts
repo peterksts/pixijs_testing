@@ -2,18 +2,24 @@ import * as PIXI from 'pixi.js';
 import 'reflect-metadata'
 import {ComponentMetadata, ElementMetadata, EventTypes, ModuleMetadata, PXUIMetadata} from './models';
 import {LoaderService} from '../services/loader.service';
+import {RouterService} from '../services/router.service';
 
 let APP: PIXI.Application;
+let routerService = new RouterService();
+let mapModule = {};
+let mapRouter = {};
+(<any>routerService).mapModule = mapModule;
+(<any>routerService).mapRouter = mapRouter;
 let Settings = {
   heightAuto: false,
   widthAuto: false,
 };
 
-function show(component: any): void {
+export function show(component: any): void {
   APP.stage.addChild(component);
 }
 
-function hide(component: any): void {
+export function hide(component: any): void {
   APP.stage.removeChild(component);
 }
 
@@ -106,6 +112,7 @@ export function Module(data: ModuleMetadata) {
     LoaderService.prototype['__pxProviders'] = target.prototype['__pxProviders'];
     const loaderService = new LoaderService();
     target.prototype['__pxProviders'][LoaderService.name] = loaderService;
+    target.prototype['__pxProviders'][RouterService.name] = routerService;
 
     data.provider && data.provider.forEach(provider => {
       provider.prototype['__pxProviders'] = target.prototype['__pxProviders'];
@@ -207,16 +214,11 @@ export function PXUI(data: PXUIMetadata) {
   return function(target: any): any {
     if (data.modules) {
       data.modules.forEach(module => {
-        const newModule = new (<any>module.module)();
-        const newElem = newModule.__pxElement;
-        show(newElem);
-        newElem.pxOnInit && newElem.pxOnInit();
-
-        if (module.prop) {
-          target.prototype[module.prop] = newElem;
-        }
+        mapModule[module.route] = module.module;
       });
     }
+
+    routerService.changeRoute();
 
     new target();
     return target;
@@ -233,6 +235,8 @@ window.addEventListener('resize', () => {
   APP.renderer.resize(width, height);
 });
 
+function changeRoute() {
+}
 
 
 

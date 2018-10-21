@@ -46,7 +46,6 @@ export interface PXUIMetadata {
     route: string,
     module: Function,
     params?: {[key: string]: any},
-    prop?: string,
   }[];
 }
 
