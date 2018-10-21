@@ -107,27 +107,35 @@ export function Module(data: ModuleMetadata) {
 
   return function (target: any): any {
 
-    // Provider
-    target.prototype['__pxProviders'] = {};
-    LoaderService.prototype['__pxProviders'] = target.prototype['__pxProviders'];
-    const loaderService = new LoaderService();
-    target.prototype['__pxProviders'][LoaderService.name] = loaderService;
-    target.prototype['__pxProviders'][RouterService.name] = routerService;
+    // target
+    target.prototype.__pxIsInit = false;
+    target.prototype.__pxInitModule = function() {
+      target.prototype.__pxIsInit = true;
 
-    data.provider && data.provider.forEach(provider => {
-      provider.prototype['__pxProviders'] = target.prototype['__pxProviders'];
-      target.prototype['__pxProviders'][provider.name] = new (<any>provider)();
-    });
-    ////////////
+      // Provider
+      target.prototype['__pxProviders'] = {};
+      LoaderService.prototype['__pxProviders'] = target.prototype['__pxProviders'];
+      const loaderService = new LoaderService();
+      target.prototype['__pxProviders'][LoaderService.name] = loaderService;
+      target.prototype['__pxProviders'][RouterService.name] = routerService;
 
-    // Sprite
-    data.sprite && loaderService.loadByConfig(data.sprite);
-    ////////////
+      data.provider && data.provider.forEach(provider => {
+        provider.prototype['__pxProviders'] = target.prototype['__pxProviders'];
+        target.prototype['__pxProviders'][provider.name] = new (<any>provider)();
+      });
+      ////////////
 
-    // element
-    (<any>data.element).element.prototype.__pxProviders = target.prototype['__pxProviders'];
-    target.prototype['__pxElement'] = new (<any>data.element.element)();
-    ////////////
+      // Sprite
+      data.sprite && loaderService.loadByConfig(data.sprite);
+      ////////////
+
+      // element
+      (<any>data.element).element.prototype.__pxProviders = target.prototype['__pxProviders'];
+      target.prototype['__pxElement'] = new (<any>data.element.element)();
+      ////////////
+
+    };
+    ///////////
 
     return target;
   }

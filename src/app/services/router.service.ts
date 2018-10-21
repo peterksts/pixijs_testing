@@ -63,6 +63,7 @@ export class RouterService {
       } else {
         module = new this.mapModule[this._route]();
         this.mapRouter[this._route] = module;
+        !module.__pxIsInit && module.__pxInitModule();
         module.__pxElement.pxOnInit && module.__pxElement.pxOnInit();
       }
     }
@@ -98,6 +99,10 @@ export class RouterService {
     if (!module) {
       module = this.mapModule['/404']();
       this.mapRouter['/404'] = module;
+    }
+    if (!module.__pxIsInit) {
+      module.__pxInitModule();
+      module.__pxElement.pxOnInit && module.__pxElement.pxOnInit();
     }
     show(module.__pxElement);
     this.is404 = true;
