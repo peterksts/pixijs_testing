@@ -1,4 +1,4 @@
-import {PXComponent, PXElement, PXEventEmitter} from "../../interfaces/pxui.interfaces";
+import {PXElement, PXEventEmitter, PXInterfaceComponent} from '../../interfaces/pxui.interfaces';
 import {Component} from "../../decorators/decorators";
 
 @Component({
@@ -10,7 +10,7 @@ import {Component} from "../../decorators/decorators";
     'changeX': 'changeX',
   },
 })
-export class TextComponent implements PXComponent {
+export class TextComponent implements PXInterfaceComponent {
 
   public text: PIXI.Text;
   public startY = 0;

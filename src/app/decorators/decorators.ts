@@ -126,12 +126,12 @@ export function Module(data: ModuleMetadata) {
       ////////////
 
       // Sprite
-      data.sprite && loaderService.loadByConfig(data.sprite);
+      data.textures && loaderService.loadByConfig(data.textures);
       ////////////
 
       // element
-      (<any>data.element).element.prototype.__pxProviders = target.prototype['__pxProviders'];
-      target.prototype['__pxElement'] = new (<any>data.element.element)();
+      (<any>data.rootElement).element.prototype.__pxProviders = target.prototype['__pxProviders'];
+      target.prototype['__pxElement'] = new (<any>data.rootElement.element)();
       ////////////
 
     };

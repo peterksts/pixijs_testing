@@ -3,12 +3,12 @@ import {DashboardElement} from './page/dashboard.element';
 import {BranchService} from './services/branch.service';
 
 @Module({
-  element: {element: DashboardElement},
+  rootElement: {element: DashboardElement},
   provider: [
     BranchService,
   ],
-  sprite: {
-    'branch': 'assets/sprite/branch.png'
+  textures: {
+    'branch': 'assets/textures/branch.png'
   },
 })
-export class HomeModule {}
+export class DashboardModule {}

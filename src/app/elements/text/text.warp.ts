@@ -1,8 +1,8 @@
 import * as PIXI from "pixi.js";
 import {AnchorEnum, ComponentData, ElementData, EventTypes, SettingsElement} from "../../decorators/models";
 import {Element, pushElOrComp, pushParams} from "../../decorators/decorators";
-import {PXComponent} from "../../interfaces/pxui.interfaces";
 import EventEmitter = PIXI.utils.EventEmitter;
+import {PXComponent} from '../../interfaces/px-component.model';
 
 export class TextWarp extends PIXI.Text {
 
@@ -11,7 +11,7 @@ export class TextWarp extends PIXI.Text {
     private __pxElementClasses: Array<ElementData>;
     private __pxSettings: SettingsElement;
     private __pxParamsMap: {[prop: string]: string};
-    private __pxComponents: Array<PXComponent> = [];
+    private __pxComponents: Array<PXComponent | any> = [];
 
     private __pxAnchor = {
         x: 0,

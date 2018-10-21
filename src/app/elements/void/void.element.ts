@@ -1,7 +1,6 @@
 import {Element} from "../../decorators/decorators";
-import {PXElement, PXInit} from "../../interfaces/pxui.interfaces";
+import {PXInit} from "../../interfaces/pxui.interfaces";
 import {TextComponent} from "../../components/text/text.component";
-import {DomElement} from "../dom/dom.element";
 import {VoidWarp} from "./void.warp";
 
 @Element({})

@@ -1,4 +1,4 @@
-import {PXComponent, PXElement, PXEventEmitter} from "../../interfaces/pxui.interfaces";
+import {PXElement, PXEventEmitter, PXInterfaceComponent} from '../../interfaces/pxui.interfaces';
 import {Component} from "../../decorators/decorators";
 import {TextElement} from "../../elements/text/text.element";
 
@@ -6,7 +6,7 @@ import {TextElement} from "../../elements/text/text.element";
     params: {
     },
 })
-export class RichTextComponent implements PXComponent {
+export class RichTextComponent implements PXInterfaceComponent {
 
     public style = new PIXI.TextStyle({
         fontFamily: 'Arial',

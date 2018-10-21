@@ -1,5 +1,5 @@
 import {PXUI} from "./decorators/decorators";
-import {HomeModule} from './home/home.module';
+import {DashboardModule} from './dashboard/dashboard.module';
 import {BuilderModule} from './builder/builder.module';
 
 @PXUI({
@@ -11,11 +11,7 @@ import {BuilderModule} from './builder/builder.module';
   modules: [
     {
         route: '/',
-        module: HomeModule,
-    },
-    {
-      route: '/builder',
-      module: BuilderModule,
+        module: DashboardModule,
     },
   ],
 })

@@ -28,9 +28,9 @@ export interface ComponentMetadata {
 }
 
 export interface ModuleMetadata {
-  element: ElementData;
+  rootElement: ElementData;
   provider?: Function[];
-  sprite?: {[key: string]: string}; // Example: LogoTexture: 'assets/logo.svg'
+  textures?: {[key: string]: string}; // Example: LogoTexture: 'assets/logo.svg'
 }
 
 export interface PXUIMetadata {

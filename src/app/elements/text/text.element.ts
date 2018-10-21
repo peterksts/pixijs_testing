@@ -1,9 +1,5 @@
-import {Element, HostListener} from "../../decorators/decorators";
-import {Metadata} from "../panel/panel.metadata";
-import {PXElement, PXInit} from "../../interfaces/pxui.interfaces";
-import {TextComponent} from "../../components/text/text.component";
-import {DomElement} from "../dom/dom.element";
-import InteractionEvent = PIXI.interaction.InteractionEvent;
+import {Element} from "../../decorators/decorators";
+import {PXInit} from "../../interfaces/pxui.interfaces";
 import {TextWarp} from "./text.warp";
 
 @Element({

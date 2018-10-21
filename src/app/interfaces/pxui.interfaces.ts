@@ -3,6 +3,7 @@ import {Subscription} from 'rxjs';
 import {AnchorEnum, ComponentData, ElementData, EventTypes, SettingsElement} from "../decorators/models";
 import {pushElOrComp, pushParams} from "../decorators/decorators";
 import EventEmitter = PIXI.utils.EventEmitter;
+import {PXComponent} from './px-component.model';
 
 export class PXElement extends PIXI.Container {
 
@@ -14,7 +15,7 @@ export class PXElement extends PIXI.Container {
   private __pxElementClasses: Array<ElementData>;
   private __pxSettings: SettingsElement;
   private __pxParamsMap: {[prop: string]: string};
-  private __pxComponents: Array<PXComponent> = [];
+  private __pxComponents: Array<PXComponent | any> = [];
 
   private __pxAnchor = {
     x: 0,
@@ -79,9 +80,9 @@ export class PXElement extends PIXI.Container {
 
   public addComponent(comp: PXComponent | any, params?: {[key: string]: any}, outgoing?: PXElement | any): any {
     comp.prototype.__pxProviders = (<any>this).__proto__.__pxProviders;
+    comp.prototype.interference = this;
     comp = new comp();
     pushParams(outgoing || this, comp, params);
-    comp.interference = this;
     comp.pxOnInit();
     this.__pxComponents.push(comp);
     return comp;
@@ -98,7 +99,7 @@ export class PXElement extends PIXI.Container {
 
 }
 
-export interface PXComponent extends PXInit, PXUpdate, PXDestroy {
+export interface PXInterfaceComponent extends PXInit, PXUpdate, PXDestroy {
   readonly interference: PIXI.Container;
   pxActive: boolean;
 

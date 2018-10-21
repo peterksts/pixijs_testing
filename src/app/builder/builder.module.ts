@@ -2,11 +2,11 @@ import {Module} from '../decorators/decorators';
 import {BuilderElement} from './page/builder.element';
 
 @Module({
-  element: {element: BuilderElement},
+  rootElement: {element: BuilderElement},
   provider: [
   ],
-  sprite: {
-    'smoke': 'assets/sprite/smoke.png'
+  textures: {
+    'smoke': 'assets/textures/smoke.png'
   },
 })
 export class BuilderModule {}
