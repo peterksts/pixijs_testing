@@ -1,6 +1,6 @@
-import * as PIXI from "pixi.js";
-import {AnchorEnum, ComponentData, ElementData, EventTypes, SettingsElement} from "../../decorators/models";
-import {Element, pushElOrComp, pushParams} from "../../decorators/decorators";
+import * as PIXI from 'pixi.js';
+import {AnchorEnum, ComponentData, ElementData, EventTypes, SettingsElement} from '../../decorators/models';
+import {Element, pushElOrComp, pushParams} from '../../decorators/decorators';
 import EventEmitter = PIXI.utils.EventEmitter;
 import {PXComponent} from '../../interfaces/px-component.model';
 
@@ -53,6 +53,16 @@ export class TextWarp extends PIXI.Text {
             (<any>child).__pxComponentsUpdate && (<any>child).__pxComponentsUpdate();
         });
     }
+
+  public pxGetComponent <T>(): T {
+    let t: T;
+    this.__pxComponents.forEach( value => {
+      if (typeof value === typeof t) {
+        t = value;
+      }
+    });
+    return t;
+  }
 
     public addComponent(comp: PXComponent | any, params?: {[key: string]: any}): any {
         comp = new comp();
