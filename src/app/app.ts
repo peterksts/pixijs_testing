@@ -21,4 +21,3 @@ import {DefaultPage404Module} from './default-page404/default-page404.module';
   ],
 })
 export class PixiApp {}
-

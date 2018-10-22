@@ -28,7 +28,7 @@ export class ClickComponent extends PXComponent implements PXInterfaceComponent 
 
   @HostListener('mousedown')
   onClick() {
-    // this.routerService.command('/home');
+    this.routerService.command('/home');
   }
 
 }

@@ -1,13 +1,15 @@
 import {hide, show} from '../decorators/decorators';
 import {CommandData} from '../models/router.model';
 
+type GuardType = (oldPath: string, newPath: string) => Promise<boolean> | boolean;
+
 export class RouterService {
 
   readonly mapModule = {};
   readonly mapRouter = {};
   private _route = document.location.pathname;
   private _queryParams = this.getQueryParams();
-  private _guards: {path: string, fn: () => boolean}[] = [];
+  private _guards: {path: string, fn: GuardType}[] = [];
   private is404 = false;
 
   get route(): string { return this._route; }
@@ -17,30 +19,32 @@ export class RouterService {
     window.onpopstate = this.changeRoute.bind(this);
   }
 
-  public command(path: string, data?: CommandData): boolean {
-    if (!this.checkGuard()) {
-      return false;
-    }
+  public command(path: string, data?: CommandData): Promise<boolean> {
+    return Promise.all(this.checkGuard(this._route, path)).then(check => {
+      if (check.find(s => s === false) === false) {
+        return false;
+      }
 
-    if (data) {
-      if (data.queryParams) {
-        path += '?';
-        for (const field in data.queryParams) {
-          path += field + '=' + data.queryParams[field];
+      if (data) {
+        if (data.queryParams) {
+          path += '?';
+          for (const field in data.queryParams) {
+            path += field + '=' + data.queryParams[field];
+          }
         }
       }
-    }
 
-    history.pushState(null, '', path);
-    this.changeRoute();
-    return true;
+      history.pushState(null, '', path);
+      this.changeRoute();
+      return true;
+    });
   }
 
-  public addGuard(path: string, fn: () => boolean) {
+  public addGuard(path: string, fn: GuardType) {
     this._guards.push({path: path, fn: fn});
   }
 
-  public changeRoute(event?): void {
+  public changeRoute(event?, checkGuard?: boolean): void {
     let oldModule;
     if (this.is404) {
       oldModule = this.mapRouter['/404'];
@@ -83,15 +87,20 @@ export class RouterService {
     return queryParams;
   }
 
-  private checkGuard(): boolean {
+  private checkGuard(oldPath: string, newPath: string): Promise<boolean>[] {
+    const promises: Promise<boolean>[] = [];
     for (let i = 0; i < this._guards.length; i++) {
       const guard = this._guards[i];
-      if (guard.path === this._route && !guard.fn()) {
-        return false;
+      if (guard.path === this._route) {
+        let res = guard.fn(oldPath, newPath);
+        if (res === true || res === false) {
+          (<any>res) = Promise.resolve(res);
+        }
+        promises.push(<Promise<boolean>>res)
       }
     }
 
-    return true;
+    return promises;
   }
 
   private page404(): void {

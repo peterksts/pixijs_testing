@@ -3,9 +3,11 @@ import 'reflect-metadata'
 import {ComponentMetadata, ElementMetadata, EventTypes, ModuleMetadata, PXUIMetadata} from './models';
 import {LoaderService} from '../services/loader.service';
 import {RouterService} from '../services/router.service';
+import {HttpClient} from '../services/http-client.service';
 
 let APP: PIXI.Application;
 let routerService = new RouterService();
+let httpClient = new HttpClient();
 let mapModule = {};
 let mapRouter = {};
 (<any>routerService).mapModule = mapModule;
@@ -118,12 +120,31 @@ export function Module(data: ModuleMetadata) {
       const loaderService = new LoaderService();
       target.prototype['__pxProviders'][LoaderService.name] = loaderService;
       target.prototype['__pxProviders'][RouterService.name] = routerService;
+      target.prototype['__pxProviders'][HttpClient.name] = httpClient;
 
       data.provider && data.provider.forEach(provider => {
         provider.prototype['__pxProviders'] = target.prototype['__pxProviders'];
         target.prototype['__pxProviders'][provider.name] = new (<any>provider)();
       });
       ////////////
+
+      // interceptor
+      data.interceptor && data.interceptor.forEach(interceptor => {
+        interceptor.prototype['__pxProviders'] = target.prototype['__pxProviders'];
+        const inter = new (<any>interceptor)();
+        target.prototype['__pxProviders'][interceptor.name] = inter;
+        httpClient.addInterceptorForModule(target.prototype.__pxRoute, inter.interceptor.bind(inter));
+      });
+      /////////////
+
+      // router guard
+      data.routerGuard && data.routerGuard.forEach(routerGuard => {
+        routerGuard.prototype['__pxProviders'] = target.prototype['__pxProviders'];
+        const guard = new (<any>routerGuard)();
+        target.prototype['__pxProviders'][routerGuard.name] = guard;
+        routerService.addGuard(target.prototype.__pxRoute, guard.routerGuard.bind(guard));
+      });
+      /////////////
 
       // Sprite
       data.textures && loaderService.loadByConfig(data.textures);
@@ -220,8 +241,14 @@ export function PXUI(data: PXUIMetadata) {
   });
 
   return function(target: any): any {
+
+    target.prototype['__pxProviders'] = {};
+    target.prototype['__pxProviders'][RouterService.name] = routerService;
+    target.prototype['__pxProviders'][HttpClient.name] = httpClient;
+
     if (data.modules) {
       data.modules.forEach(module => {
+        module.module.prototype.__pxRoute = module.route;
         mapModule[module.route] = module.module;
       });
     }

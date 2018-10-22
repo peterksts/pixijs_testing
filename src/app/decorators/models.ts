@@ -30,6 +30,8 @@ export interface ComponentMetadata {
 export interface ModuleMetadata {
   rootElement: ElementData;
   provider?: Function[];
+  interceptor?: Function[];
+  routerGuard?: Function[];
   textures?: {[key: string]: string}; // Example: LogoTexture: 'assets/logo.svg'
 }
 
