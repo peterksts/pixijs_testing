@@ -1,8 +1,8 @@
 import * as PIXI from 'pixi.js'
 
-export class LoaderService {
+export class TextureService {
 
-  public mapTexture: {[key: string]: PIXI.Texture} = {};
+  readonly mapTexture: {[key: string]: PIXI.Texture} = {};
 
   constructor() {
   }
@@ -18,6 +18,14 @@ export class LoaderService {
     const texture = PIXI.Texture.fromImage(path);
     if (key) {
       this.mapTexture[key] = texture;
+    }
+    return texture;
+  }
+
+  public getTexture(key: string): PIXI.Texture {
+    const texture = this.mapTexture[key];
+    if (!texture) {
+      console.error(`Not found: '${key}' texture`);
     }
     return texture;
   }

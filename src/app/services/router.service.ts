@@ -34,8 +34,9 @@ export class RouterService {
         }
       }
 
+      const pR = this._route;
       history.pushState(null, '', path);
-      this.changeRoute();
+      this.changeRoute(null, true);
       return true;
     });
   }
@@ -45,33 +46,44 @@ export class RouterService {
   }
 
   public changeRoute(event?, checkGuard?: boolean): void {
-    let oldModule;
-    if (this.is404) {
-      oldModule = this.mapRouter['/404'];
-    } else {
-      oldModule = this.mapRouter[this._route];
+    let promises: Promise<boolean>[] = [];
+    if (!checkGuard) {
+      promises = this.checkGuard(this._route, document.location.pathname);
     }
-    if (oldModule) {
-      hide(oldModule.__pxElement);
-    }
-    this.is404 = false;
 
-    this._route = document.location.pathname;
-    this._queryParams = this.getQueryParams();
-
-    let module = this.mapRouter[this._route];
-    if (!module) {
-      if (!this.mapModule[this._route]) {
-        this.page404();
+    Promise.all(promises).then(check => {
+      if (check.find(s => s === false) === false) {
         return;
-      } else {
-        module = new this.mapModule[this._route]();
-        this.mapRouter[this._route] = module;
-        !module.__pxIsInit && module.__pxInitModule();
-        module.__pxElement.pxOnInit && module.__pxElement.pxOnInit();
       }
-    }
-    show(module.__pxElement);
+
+      let oldModule;
+      if (this.is404) {
+        oldModule = this.mapRouter['/404'];
+      } else {
+        oldModule = this.mapRouter[this._route];
+      }
+      if (oldModule) {
+        hide(oldModule.__pxElement);
+      }
+      this.is404 = false;
+
+      this._route = document.location.pathname;
+      this._queryParams = this.getQueryParams();
+
+      let module = this.mapRouter[this._route];
+      if (!module) {
+        if (!this.mapModule[this._route]) {
+          this.page404();
+          return;
+        } else {
+          module = new this.mapModule[this._route]();
+          this.mapRouter[this._route] = module;
+          !module.__pxIsInit && module.__pxInitModule();
+          module.__pxElement.pxOnInit && module.__pxElement.pxOnInit();
+        }
+      }
+      show(module.__pxElement);
+    });
   }
 
   private getQueryParams(): {[key: string]: string} {
@@ -91,7 +103,7 @@ export class RouterService {
     const promises: Promise<boolean>[] = [];
     for (let i = 0; i < this._guards.length; i++) {
       const guard = this._guards[i];
-      if (guard.path === this._route) {
+      if (guard.path === this._route || guard.path === 'all') {
         let res = guard.fn(oldPath, newPath);
         if (res === true || res === false) {
           (<any>res) = Promise.resolve(res);

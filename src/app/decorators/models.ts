@@ -49,6 +49,8 @@ export interface PXUIMetadata {
     module: Function,
     params?: {[key: string]: any},
   }[];
+  interceptor?: Function[];
+  routerGuard?: Function[];
 }
 
 export enum AnchorEnum {

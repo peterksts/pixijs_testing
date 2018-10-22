@@ -1,9 +1,10 @@
 import * as PIXI from 'pixi.js';
 import 'reflect-metadata'
 import {ComponentMetadata, ElementMetadata, EventTypes, ModuleMetadata, PXUIMetadata} from './models';
-import {LoaderService} from '../services/loader.service';
+import {TextureService} from '../services/texture.service';
 import {RouterService} from '../services/router.service';
 import {HttpClient} from '../services/http-client.service';
+import {AudioService} from '../services/audio.service';
 
 let APP: PIXI.Application;
 let routerService = new RouterService();
@@ -116,11 +117,14 @@ export function Module(data: ModuleMetadata) {
 
       // Provider
       target.prototype['__pxProviders'] = {};
-      LoaderService.prototype['__pxProviders'] = target.prototype['__pxProviders'];
-      const loaderService = new LoaderService();
-      target.prototype['__pxProviders'][LoaderService.name] = loaderService;
       target.prototype['__pxProviders'][RouterService.name] = routerService;
       target.prototype['__pxProviders'][HttpClient.name] = httpClient;
+      AudioService.prototype['__pxProviders'] =  target.prototype['__pxProviders'];
+      const audioService = new AudioService();
+      target.prototype['__pxProviders'][AudioService.name] = audioService;
+      TextureService.prototype['__pxProviders'] = target.prototype['__pxProviders'];
+      const textureService = new TextureService();
+      target.prototype['__pxProviders'][TextureService.name] = textureService;
 
       data.provider && data.provider.forEach(provider => {
         provider.prototype['__pxProviders'] = target.prototype['__pxProviders'];
@@ -147,7 +151,7 @@ export function Module(data: ModuleMetadata) {
       /////////////
 
       // Sprite
-      data.textures && loaderService.loadByConfig(data.textures);
+      data.textures && textureService.loadByConfig(data.textures);
       ////////////
 
       // element
@@ -157,6 +161,11 @@ export function Module(data: ModuleMetadata) {
 
     };
     ///////////
+
+    // destroy
+    target.prototype.__pxDestroyModule = function() {
+    };
+    //////////
 
     return target;
   }
@@ -219,6 +228,8 @@ export function Component(data: ComponentMetadata) {
 }
 
 export function PXUI(data: PXUIMetadata) {
+
+  // PIXI.Application
   if (data.settings.height === 'auto') {
     data.settings.height = window.innerHeight;
     Settings.heightAuto = true;
@@ -239,12 +250,31 @@ export function PXUI(data: PXUIMetadata) {
       (<any>child).__pxComponentsUpdate && (<any>child).__pxComponentsUpdate();
     });
   });
+  /////////////////////
 
   return function(target: any): any {
 
     target.prototype['__pxProviders'] = {};
     target.prototype['__pxProviders'][RouterService.name] = routerService;
     target.prototype['__pxProviders'][HttpClient.name] = httpClient;
+
+    // interceptor
+    data.interceptor && data.interceptor.forEach(interceptor => {
+      interceptor.prototype['__pxProviders'] = target.prototype['__pxProviders'];
+      const inter = new (<any>interceptor)();
+      target.prototype['__pxProviders'][interceptor.name] = inter;
+      httpClient.addInterceptor(inter.interceptor.bind(inter));
+    });
+    /////////////
+
+    // router guard
+    data.routerGuard && data.routerGuard.forEach(routerGuard => {
+      routerGuard.prototype['__pxProviders'] = target.prototype['__pxProviders'];
+      const guard = new (<any>routerGuard)();
+      target.prototype['__pxProviders'][routerGuard.name] = guard;
+      routerService.addGuard('all', guard.routerGuard.bind(guard));
+    });
+    /////////////
 
     if (data.modules) {
       data.modules.forEach(module => {

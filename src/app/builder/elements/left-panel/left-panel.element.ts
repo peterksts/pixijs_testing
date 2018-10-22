@@ -1,6 +1,6 @@
 import {PXElement, PXInit} from '../../../interfaces/pxui.interfaces';
 import {Element, Inject} from '../../../decorators/decorators';
-import {LoaderService} from '../../../services/loader.service';
+import {TextureService} from '../../../services/texture.service';
 
 @Element({
 })
