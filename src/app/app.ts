@@ -17,10 +17,6 @@ import {TestModule} from './dashboard/test.module';
 		},
 		{
 			route: '/',
-			module: DashboardModule,
-		},
-		{
-			route: '/test',
 			module: TestModule,
 		},
 	],

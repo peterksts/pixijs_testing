@@ -54,6 +54,16 @@ export class TextWarp extends PIXI.Text {
         });
     }
 
+  public pxGetComponent <T>(): T {
+    let t: T;
+    this.__pxComponents.forEach( value => {
+      if (typeof value === typeof t) {
+        t = value;
+      }
+    });
+    return t;
+  }
+
     public addComponent(comp: PXComponent | any, params?: {[key: string]: any}): any {
         comp = new comp();
         pushParams(this, comp, params);
