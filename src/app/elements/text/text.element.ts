@@ -1,32 +1,22 @@
-import {Element} from "../../decorators/decorators";
-import {PXInit} from "../../interfaces/pxui.interfaces";
-import {TextWarp} from "./text.warp";
+import {Element} from '../../decorators/decorators';
+import {PXInit} from '../../interfaces/pxui.interfaces';
+import {TextWarp} from './text.warp';
+import {ComponentData} from '../../decorators/models';
 
 @Element({
-    params: {
-        'text': 'text',
-    }
+  params: {
+    'text': 'text',
+    'components': 'pxcomponents'
+  }
 })
 export class TextElement extends TextWarp implements PXInit {
 
-    pxOnInit(): void {
-        // const dom = new DomElement({
-        //   'position': {x: 300, y: 200},
-        // });
-        // dom.pxOnInit();
-        // this.addChild(dom);
-        /*this.addElement(DomElement, {
-            'position': {x: 300, y: 300},
-        })*/
+  private pxcomponents: ComponentData[];
 
-        // this.on("mousedown", () => {
-        //   console.log(11);
-        // });
-    }
-
-    /*@HostListener('mousedown')
-    onClick(event: InteractionEvent) {
-        console.log(1);
-    }*/
+  pxOnInit(): void {
+    this.pxcomponents.forEach(value => {
+      this.addComponent(value.component, value.params);
+    });
+  }
 
 }

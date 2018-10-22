@@ -1,6 +1,6 @@
-import * as PIXI from "pixi.js";
-import {AnchorEnum, ComponentData, ElementData, EventTypes, SettingsElement} from "../../decorators/models";
-import {Element, pushElOrComp, pushParams} from "../../decorators/decorators";
+import * as PIXI from 'pixi.js';
+import {AnchorEnum, ComponentData, ElementData, EventTypes, SettingsElement} from '../../decorators/models';
+import {Element, pushElOrComp, pushParams} from '../../decorators/decorators';
 import EventEmitter = PIXI.utils.EventEmitter;
 import {PXComponent} from '../../interfaces/px-component.model';
 
