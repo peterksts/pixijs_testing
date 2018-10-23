@@ -1,8 +1,8 @@
-import {PXUI} from './decorators/decorators';
-import {DashboardModule} from './dashboard/dashboard.module';
-import {BuilderModule} from './builder/builder.module';
-import {DefaultPage404Module} from './default-page404/default-page404.module';
-import {TestModule} from './dashboard/test.module';
+import {PXUI} from './decorators/px-ui.decorator';
+import {DashboardModule} from './modules/dashboard/dashboard.module';
+import {BuilderModule} from './modules/builder/builder.module';
+import {DefaultPage404Module} from './modules/default-page404/default-page404.module';
+import {TestModule} from './modules/dashboard/test.module';
 
 @PXUI({
 	settings: {
@@ -21,4 +21,4 @@ import {TestModule} from './dashboard/test.module';
 		},
 	],
 })
-export class PixiApp {}
+export class App {}

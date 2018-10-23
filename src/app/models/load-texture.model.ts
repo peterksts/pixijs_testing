@@ -4,5 +4,3 @@ export class LoadTextureModel {
   scaleMode?: number;
   sourceScale?: number;
 }
-
-export type LoadTextureType = LoadTextureModel | string;

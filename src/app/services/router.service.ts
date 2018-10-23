@@ -1,4 +1,4 @@
-import {hide, show} from '../decorators/decorators';
+import {PX} from '../px';
 import {CommandData} from '../models/router.model';
 
 type GuardType = (oldPath: string, newPath: string) => Promise<boolean> | boolean;
@@ -63,7 +63,7 @@ export class RouterService {
         oldModule = this.mapRouter[this._route];
       }
       if (oldModule) {
-        hide(oldModule.__pxElement);
+        PX.hide(oldModule.__pxElement);
       }
       this.is404 = false;
 
@@ -82,7 +82,7 @@ export class RouterService {
           module.__pxElement.pxOnInit && module.__pxElement.pxOnInit();
         }
       }
-      show(module.__pxElement);
+      PX.show(module.__pxElement);
     });
   }
 
@@ -125,7 +125,7 @@ export class RouterService {
       module.__pxInitModule();
       module.__pxElement.pxOnInit && module.__pxElement.pxOnInit();
     }
-    show(module.__pxElement);
+    PX.show(module.__pxElement);
     this.is404 = true;
   }
 

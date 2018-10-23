@@ -1,12 +1,13 @@
-import {PXElement, PXEventEmitter, PXInterfaceComponent} from '../../interfaces/pxui.interfaces';
-import {Component} from "../../decorators/decorators";
 import {TextElement} from "../../elements/text/text.element";
+import {Component} from '../../decorators/component.decorator';
+import {PXInterfaceComponent} from '../../interfaces/px.interface';
+import {PXComponent} from '../../models/px-component.model';
 
 @Component({
     params: {
     },
 })
-export class RichTextComponent implements PXInterfaceComponent {
+export class RichTextComponent extends PXComponent implements PXInterfaceComponent {
 
     public style = new PIXI.TextStyle({
         fontFamily: 'Arial',
@@ -33,7 +34,6 @@ export class RichTextComponent implements PXInterfaceComponent {
     }
 
     pxOnUpdate(): void {
-
     }
 
     pxOnDestroy(): void {

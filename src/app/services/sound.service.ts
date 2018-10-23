@@ -1,5 +1,5 @@
 import * as PIXI from "pixi-sound";
-import {LoadSoundType} from '../models/load-sound.type';
+import {LoadSoundType} from '../types/load-sound.type';
 
 export class SoundService {
 

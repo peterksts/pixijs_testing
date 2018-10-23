@@ -1,7 +1,7 @@
-import {Element} from '../../decorators/decorators';
-import {PXInit} from '../../interfaces/pxui.interfaces';
-import {TextWarp} from './text.warp';
-import {ComponentData} from '../../decorators/models';
+import {TextWarp} from '../../wrappers/text.warp';
+import {ComponentData} from '../../interfaces/metadata.interface';
+import {PXInit} from '../../interfaces/px.interface';
+import {Element} from '../../decorators/element.decorator';
 
 @Element({
   params: {
@@ -18,7 +18,5 @@ export class TextElement extends TextWarp implements PXInit {
       this.addComponent(value.component, value.params);
     });
   }
-
-
 
 }

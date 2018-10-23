@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js'
-import {LoadTextureType} from '../models/load-texture.model';
+import {LoadTextureType} from '../types/load-texture.type';
 
 export class TextureService {
 

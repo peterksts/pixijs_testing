@@ -1,28 +1,12 @@
-import {Element} from "../../decorators/decorators";
-import {PXInit} from "../../interfaces/pxui.interfaces";
-import {TextComponent} from "../../components/text/text.component";
-import {VoidWarp} from "./void.warp";
+import {VoidWarp} from "../../wrappers/void.warp";
+import {PXInit} from '../../interfaces/px.interface';
+import {Element} from '../../decorators/element.decorator';
 
-@Element({})
+@Element({
+})
 export class VoidElement extends VoidWarp implements PXInit {
 
-    public textList: TextComponent[];
-
-    pxOnInit(): void {
-        // const dom = new DomElement({
-        //   'position': {x: 300, y: 200},
-        // });
-        // dom.pxOnInit();
-        // this.addChild(dom);
-
-        // this.on("mousedown", () => {
-        //   console.log(11);
-        // });
-    }
-
-    /*@HostListener('mousedown')
-    onClick(event: InteractionEvent) {
-        console.log(1);
-    }*/
+  pxOnInit(): void {
+  }
 
 }
