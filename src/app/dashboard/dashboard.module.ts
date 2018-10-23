@@ -5,7 +5,7 @@ import {ErrorInterceptor} from './services/error.interceptor';
 import {LetRedirectRouterGuard} from './services/let-redirect.router-guard';
 
 @Module({
-  rootElement: {element: DashboardElement},
+  rootElement: DashboardElement,
   provider: [
     BranchService,
   ],
@@ -16,7 +16,10 @@ import {LetRedirectRouterGuard} from './services/let-redirect.router-guard';
     LetRedirectRouterGuard,
   ],
   textures: {
-    'branch': 'assets/textures/branch.png'
+    'branch': {imageUrl: 'assets/textures/branch.png'}, // or 'assets/textures/branch.png';
   },
+  sound: {
+    'wild_boar': {url: 'assets/sound/wild_boar.mp3', loop: true}, // or 'assets/sound/wild_boar.mp3';
+  }
 })
 export class DashboardModule {}

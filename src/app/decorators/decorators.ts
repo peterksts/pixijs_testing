@@ -4,7 +4,7 @@ import {ComponentMetadata, ElementMetadata, EventTypes, ModuleMetadata, PXUIMeta
 import {TextureService} from '../services/texture.service';
 import {RouterService} from '../services/router.service';
 import {HttpClient} from '../services/http-client.service';
-import {AudioService} from '../services/audio.service';
+import {SoundService} from '../services/sound.service';
 
 let APP: PIXI.Application;
 let routerService = new RouterService();
@@ -119,9 +119,9 @@ export function Module(data: ModuleMetadata) {
       target.prototype['__pxProviders'] = {};
       target.prototype['__pxProviders'][RouterService.name] = routerService;
       target.prototype['__pxProviders'][HttpClient.name] = httpClient;
-      AudioService.prototype['__pxProviders'] =  target.prototype['__pxProviders'];
-      const audioService = new AudioService();
-      target.prototype['__pxProviders'][AudioService.name] = audioService;
+      SoundService.prototype['__pxProviders'] =  target.prototype['__pxProviders'];
+      const soundService = new SoundService();
+      target.prototype['__pxProviders'][SoundService.name] = soundService;
       TextureService.prototype['__pxProviders'] = target.prototype['__pxProviders'];
       const textureService = new TextureService();
       target.prototype['__pxProviders'][TextureService.name] = textureService;
@@ -154,9 +154,18 @@ export function Module(data: ModuleMetadata) {
       data.textures && textureService.loadByConfig(data.textures);
       ////////////
 
+      // Sound
+      data.sound && soundService.loadByConfig(data.sound);
+      ////////////
+
       // element
-      (<any>data.rootElement).element.prototype.__pxProviders = target.prototype['__pxProviders'];
-      target.prototype['__pxElement'] = new (<any>data.rootElement.element)();
+      if (typeof data.rootElement === 'object') {
+        (<any>data.rootElement).element.prototype.__pxProviders = target.prototype['__pxProviders'];
+        target.prototype['__pxElement'] = new (<any>data.rootElement.element)();
+      } else {
+        (<any>data.rootElement).prototype.__pxProviders = target.prototype['__pxProviders'];
+        target.prototype['__pxElement'] = new (<any>data.rootElement)();
+      }
       ////////////
 
     };

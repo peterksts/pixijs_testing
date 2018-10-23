@@ -1,4 +1,5 @@
 import * as PIXI from 'pixi.js'
+import {LoadTextureType} from '../models/load-texture.model';
 
 export class TextureService {
 
@@ -7,15 +8,26 @@ export class TextureService {
   constructor() {
   }
 
-  public loadByConfig(data: {[key: string]: string}): {[key: string]: PIXI.Texture} {
+  public loadByConfig(data: {[key: string]: LoadTextureType}): {[key: string]: PIXI.Texture} {
     for (const field in data) {
-      this.mapTexture[field] = PIXI.Texture.fromImage(data[field]);
+      const d = data[field];
+      if (typeof d === 'object') {
+        this.mapTexture[field] = PIXI.Texture.fromImage(d.imageUrl, d.crossOrigin, d.scaleMode, d.sourceScale);
+      } else {
+        this.mapTexture[field] = PIXI.Texture.fromImage(d);
+      }
     }
     return this.mapTexture;
   }
 
-  public load(path: string, key?: string): PIXI.Texture {
-    const texture = PIXI.Texture.fromImage(path);
+  public load(data: LoadTextureType, key?: string): PIXI.Texture {
+    let texture: PIXI.Texture;
+    if (typeof data === 'object') {
+      texture = PIXI.Texture.fromImage(data.imageUrl, data.crossOrigin, data.scaleMode, data.sourceScale);
+    } else {
+      texture = PIXI.Texture.fromImage(data);
+    }
+
     if (key) {
       this.mapTexture[key] = texture;
     }

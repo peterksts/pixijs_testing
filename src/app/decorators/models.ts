@@ -1,5 +1,7 @@
 import ApplicationOptions = PIXI.ApplicationOptions;
 import InteractionEventTypes = PIXI.interaction.InteractionEventTypes;
+import {LoadTextureType} from '../models/load-texture.model';
+import {LoadSoundType} from '../models/load-sound.type';
 
 export interface ComponentData {
   component: Function,
@@ -28,11 +30,12 @@ export interface ComponentMetadata {
 }
 
 export interface ModuleMetadata {
-  rootElement: ElementData;
+  rootElement: ElementData | Function;
   provider?: Function[];
   interceptor?: Function[];
   routerGuard?: Function[];
-  textures?: {[key: string]: string}; // Example: LogoTexture: 'assets/logo.svg'
+  textures?: {[key: string]: LoadTextureType};
+  sound?: {[key: string]: LoadSoundType};
 }
 
 export interface PXUIMetadata {
