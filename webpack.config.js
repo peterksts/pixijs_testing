@@ -8,15 +8,16 @@ module.exports = {
   mode: "development", // "production" | "development" | "none"  // Chosen mode tells webpack to use its built-in optimizations accordingly.
 
   output: {
-    filename: 'app.js',
-    chunkFilename: 'vendor.js',
+    filename: '[name].js',
+    // chunkFilename: 'vendor.js',
     path: path.resolve(__dirname, 'dist'),
     publicPath: '/assets/',
   },
 
   // Currently we need to add '.ts' to the resolve.extensions array.
   resolve: {
-    extensions: ['.ts', '.tsx', '.js', '.jsx']
+    extensions: ['.ts', '.tsx', '.js', '.jsx'],
+    moduleExtensions: ['node_modules'],
   },
 
   // Source maps support ('inline-source-map' also works)
@@ -35,7 +36,7 @@ module.exports = {
 
   // context: path.join(__dirname, 'src/assets'),
   plugins: [
-    // new CleanWebpackPlugin('dist', {} ),
+    new CleanWebpackPlugin('dist', {} ),
     new CopyWebpackPlugin([
       { from: 'src/assets', to: 'assets' }
     ]),
@@ -48,18 +49,25 @@ module.exports = {
   ],
 
   optimization: {
+    runtimeChunk: 'single',
     splitChunks: {
-      name: true,
+      maxInitialRequests: Infinity,
+      minSize: 0,
+      chunks: 'all',
       cacheGroups: {
-        commons: {
+        vendor: {
           test: /[\\/]node_modules[\\/]/,
-          name: 'vendors',
-          chunks: 'all',
-          maxSize: 10000000,
-          reuseExistingChunk: true,
+          name: 'vendor',
         },
-      }
-    }
+        modules: {
+          test: /\.module.ts?$/,
+          name(module) {
+            let packageName = module.context.substr(module.context.lastIndexOf('/') + 1, module.context.length - 1);
+            return `module.${packageName}`;
+          },
+        }
+      },
+    },
   },
 
   serve: { //object

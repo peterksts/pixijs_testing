@@ -1,8 +1,8 @@
 import {ElementMetadata} from '../../../interfaces/metadata.interface';
-import {ClickComponent} from '../components/click.component';
 import {TextElement} from '../../../elements/text/text.element';
 import {RichTextComponent} from '../../../components/text/richtext.component';
-import {RichEffectComponent} from '../components/richtexteffects.components';
+import {RichEffectComponent} from '../../dashboard/components/richtexteffects.components';
+import {ClickComponent} from '../../dashboard/components/click.component';
 
 export const Metadata: ElementMetadata = {
   components: [

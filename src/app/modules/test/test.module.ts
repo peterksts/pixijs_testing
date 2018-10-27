@@ -1,5 +1,5 @@
 import {Module} from '../../decorators/module.decorator';
-import {BranchService} from './services/branch.service';
+import {BranchService} from '../dashboard/services/branch.service';
 import {TestElement} from './page/test.element';
 
 @Module({

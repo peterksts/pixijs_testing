@@ -2,7 +2,7 @@ import {PXUI} from './decorators/px-ui.decorator';
 import {DashboardModule} from './modules/dashboard/dashboard.module';
 import {BuilderModule} from './modules/builder/builder.module';
 import {DefaultPage404Module} from './modules/default-page404/default-page404.module';
-import {TestModule} from './modules/dashboard/test.module';
+import {TestModule} from './modules/test/test.module';
 
 @PXUI({
 	settings: {
