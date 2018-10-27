@@ -9,9 +9,7 @@ module.exports = {
 
   output: {
     filename: '[name].js',
-    // chunkFilename: 'vendor.js',
     path: path.resolve(__dirname, 'dist'),
-    publicPath: '/assets/',
   },
 
   // Currently we need to add '.ts' to the resolve.extensions array.
@@ -34,17 +32,14 @@ module.exports = {
     ]
   },
 
-  // context: path.join(__dirname, 'src/assets'),
   plugins: [
     new CleanWebpackPlugin('dist', {} ),
     new CopyWebpackPlugin([
       { from: 'src/assets', to: 'assets' }
     ]),
     new HtmlWebpackPlugin({
-      inject: false,
-      hash: true,
+      title: 'PX_ts',
       template: './src/index.html',
-      filename: 'index.html'
     }),
   ],
 
