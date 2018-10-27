@@ -11,7 +11,6 @@ export class TestElement extends PXElement implements PXInit {
   @Inject() private textureService: TextureService;
 
   pxOnInit(): void {
-
   }
 
 }

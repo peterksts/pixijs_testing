@@ -5,9 +5,9 @@
   "main": "./dist/app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "serve": "webpack-serve ./webpack.config.js",
-    "server": "webpack-dev-server",
-    "dev": "webpack --watch",
+    "server": "webpack-serve ./webpack.config.js",
+    "serve": "webpack-dev-server",
+    "dev": "webpack --mode development",
     "prod": "webpack -p --mode production"
   },
   "author": "",

@@ -23,7 +23,7 @@ export class Page404Element extends PXElement implements PXInit {
   });
 
   pxOnInit(): void {
-    const text = new PIXI.Text('page not found');
+    const text = new PIXI.Text('page not found !');
     this.addChild(text);
     text.style = this.style;
     text.style.fontSize = 20;

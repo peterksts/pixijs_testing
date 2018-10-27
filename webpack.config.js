@@ -4,6 +4,18 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
+
+  devServer: {
+    historyApiFallback: true,
+    port: 3000,
+    // proxy: {
+    //   '^/api/*': {
+    //     target: 'http://localhost:8080/api/',
+    //     secure: false
+    //   }
+    // }
+  },
+
   entry: ['./src/app/app.ts'],
   mode: "development", // "production" | "development" | "none"  // Chosen mode tells webpack to use its built-in optimizations accordingly.
 
@@ -71,24 +83,4 @@ module.exports = {
     // ...
   },
 
-  devServer: {
-    // proxy: { // proxy URLs to backend development server
-    //   '/api': 'http://localhost:3000'
-    // },
-    // contentBase: path.join(__dirname, './dist'), // boolean | string | array, static file location
-    // https: false, // true for self-signed, object for cert authority
-    // noInfo: true, // only errors & warns on hot reload
-    // compress: true,
-
-    // disableHostCheck: true,
-    // hot: true, // hot module replacement. Depends on HotModuleReplacementPlugin
-    // compress: true, // enable gzip compression
-    contentBase: './dist',
-    historyApiFallback: true, // true for index.html upon 404, object for multiple paths
-    // hot: true,
-    watchContentBase: false,
-    port: 1339,
-
-    // ...
-  },
 };
