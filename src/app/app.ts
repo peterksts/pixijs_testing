@@ -17,8 +17,12 @@ import {TestModule} from './modules/test/test.module';
 		},
 		{
 			route: '/',
-			module: TestModule,
+			module: DashboardModule,
 		},
+    {
+      route: '/test',
+      module: TestModule,
+    },
 	],
 })
 export class App {}

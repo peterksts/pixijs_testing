@@ -16,7 +16,6 @@ import {Inject} from '../../../decorators/Inject.decorator';
 export class RichEffectComponent extends PXComponent implements PXInterfaceComponent {
 
   @Inject() private routerService: RouterService;
-  private richComponent: RichTextComponent;
   private time: number;
   private back: boolean;
   public speed: number;
@@ -24,7 +23,6 @@ export class RichEffectComponent extends PXComponent implements PXInterfaceCompo
   public maxValue: number;
 
   pxOnInit(): void {
-    this.richComponent = (<TextElement>this.interference).pxGetComponent<RichTextComponent>();
     this.time = this.minValue;
     this.back = false;
   }

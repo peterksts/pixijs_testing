@@ -6,7 +6,7 @@ import {PXComponent} from '../models/px-component.model';
 import {AnchorEnum} from '../enums/anchor.enum';
 import {EventTypes} from '../types/event-types.type';
 
-export class TextWarp extends PIXI.Text {
+export class TextWrap extends PIXI.Text {
 
     private __pxEvents: Array<{event: EventTypes; fn: Function}> = [];
     private __pxComponentClasses: Array<ComponentData>;
@@ -56,14 +56,12 @@ export class TextWarp extends PIXI.Text {
         });
     }
 
-  public pxGetComponent <T>(): T {
-    let t: T;
-    this.__pxComponents.forEach( value => {
-      if (typeof value === typeof t) {
-        t = value;
-      }
-    });
-    return t;
+  public pxGetComponents <T>(typeComponent): T[] {
+    return this.__pxComponents.filter(value => value instanceof typeComponent);
+  }
+
+  public pxGetComponent <T>(typeComponent): T {
+    return this.__pxComponents.find(value => value instanceof typeComponent);
   }
 
     public addComponent(comp: PXComponent | any, params?: {[key: string]: any}): any {

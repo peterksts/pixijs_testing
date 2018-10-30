@@ -6,7 +6,7 @@ import {PXComponent} from '../models/px-component.model';
 import {AnchorEnum} from '../enums/anchor.enum';
 import {EventTypes} from '../types/event-types.type';
 
-export class VoidWarp extends PIXI.Container {
+export class VoidWrap extends PIXI.Container {
 
     private __pxEvents: Array<{event: EventTypes; fn: Function}> = [];
     private __pxComponentClasses: Array<ComponentData>;

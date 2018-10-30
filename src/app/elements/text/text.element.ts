@@ -1,4 +1,4 @@
-import {TextWarp} from '../../wrappers/text.warp';
+import {TextWrap} from '../../wrappers/text.wrap';
 import {ComponentData} from '../../interfaces/metadata.interface';
 import {PXInit} from '../../interfaces/px.interface';
 import {Element} from '../../decorators/element.decorator';
@@ -9,7 +9,7 @@ import {Element} from '../../decorators/element.decorator';
     'components': 'pxcomponents'
   }
 })
-export class TextElement extends TextWarp implements PXInit {
+export class TextElement extends TextWrap implements PXInit {
 
   private pxcomponents: ComponentData[];
 
