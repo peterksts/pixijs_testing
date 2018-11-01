@@ -9,7 +9,7 @@ export interface ComponentData {
 }
 
 export interface ModuleData {
-  route: string,
+  route?: string,
   module: Function,
   params?: {[key: string]: any},
 }
@@ -52,6 +52,8 @@ export interface PXUIMetadata {
     sharedTicker?: boolean,
     sharedLoader?: boolean
   }
+  page404: Function;
+  root: Function;
   modules?: ModuleData[];
   interceptor?: Function[];
   routerGuard?: Function[];

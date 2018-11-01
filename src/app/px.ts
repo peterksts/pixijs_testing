@@ -1,9 +1,11 @@
 import * as PIXI from "pixi.js";
 import {RouterService} from './services/router.service';
 import {HttpClient} from './services/http-client.service';
+import {RouterElement} from './elements/router/router.element';
 
 class px {
 
+  public routerElement: RouterElement;
   public APP: PIXI.Application;
   public Settings = {
     heightAuto: false,
@@ -14,11 +16,11 @@ class px {
   }
 
   public show(component: any): void {
-    this.APP.stage.addChild(component);
+    this.routerElement && this.routerElement.addChild(component);
   }
 
   public hide(component: any): void {
-    this.APP.stage.removeChild(component);
+    this.routerElement && this.routerElement.removeChild(component);
   }
 
 }
