@@ -3,6 +3,8 @@ import {MainService, PX} from '../px';
 import {PXUIMetadata} from '../interfaces/metadata.interface';
 import {RouterService} from '../services/router.service';
 import {HttpClient} from '../services/http-client.service';
+import {RootElement} from '../modules/root/page/root.element';
+import {RootModule} from '../modules/root/root.module';
 
 export function PXUI(data: PXUIMetadata) {
 
@@ -52,6 +54,19 @@ export function PXUI(data: PXUIMetadata) {
       MainService.routerService.addGuard('all', guard.routerGuard.bind(guard));
     });
     /////////////
+
+    if (data.page404) {
+      MainService.mapModule['page404'] = data.page404;
+      MainService.mapRouter['page404'] = new (<any>data.page404)();
+    }
+
+    if (data.root) {
+      MainService.mapModule['root'] = data.root;
+      const rootElement = new (<any>data.root)();
+      rootElement.__pxInitModule();
+      MainService.mapRouter['root'] = rootElement;
+      PX.APP.stage.addChild(rootElement.__pxElement);
+    }
 
     if (data.modules) {
       data.modules.forEach(module => {

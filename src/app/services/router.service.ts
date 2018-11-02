@@ -58,7 +58,7 @@ export class RouterService {
 
       let oldModule;
       if (this.is404) {
-        oldModule = this.mapRouter['/404'];
+        oldModule = this.mapRouter['page404'];
       } else {
         oldModule = this.mapRouter[this._route];
       }
@@ -116,10 +116,10 @@ export class RouterService {
   }
 
   private page404(): void {
-    let module = this.mapRouter['/404'];
+    let module = this.mapRouter['page404'];
     if (!module) {
-      module = new this.mapModule['/404']();
-      this.mapRouter['/404'] = module;
+      module = new this.mapModule['page404']();
+      this.mapRouter['page404'] = module;
     }
     if (!module.__pxIsInit) {
       module.__pxInitModule();
