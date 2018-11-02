@@ -1,10 +1,13 @@
 import {Metadata} from './test.metadata';
 import * as PIXI from 'pixi.js';
+import 'pixi-projection';
 import {TextureService} from '../../../services/texture.service';
 import {PXElement} from '../../../wrappers/px-element.wrap';
 import {PXInit} from '../../../interfaces/px.interface';
 import {Element} from '../../../decorators/element.decorator';
 import {Inject} from '../../../decorators/Inject.decorator';
+import {ProjectionComponent} from "../components/projection.component";
+import {pushTarget} from "../../../tools/push-target.tool";
 
 @Element(Metadata)
 export class TestElement extends PXElement implements PXInit {
@@ -16,10 +19,11 @@ export class TestElement extends PXElement implements PXInit {
   pxOnInit(): void {
     var w = 200, h = 200;
 
-    function createSquare(x, y) {
-      let square: PIXI.Sprite = new PIXI.Sprite(PIXI.Texture.WHITE);
+    function createSquare(x, y):DragSprite {
+      let square:DragSprite = new DragSprite();
+      square.texture = PIXI.Texture.WHITE;
       square.tint = 0xff0000;
-      //square.fa = 1;
+      //square.factor = 1;
       square.anchor.set(0.5);
       square.position.set(x, y);
       return square;
@@ -32,35 +36,50 @@ export class TestElement extends PXElement implements PXInit {
       createSquare(w - 150, h + 150)
     ];
 
-    var quad = squares.map(function (s) {
+    var quad = squares.map(function (s:any) {
       return s.position
     });
 
 //add sprite itself
-    let containerSprite = new PIXI.projection.Sprite2s(new PIXI.Texture.fromImage('required/assets/SceneRotate.jpg'));
+    let containerSprite: PIXI.projection.Sprite2s = new PIXI.projection.Sprite2s(this.textureService.getTexture('branch'));
     containerSprite.anchor.set(0.5);
 
     this.addChild(containerSprite);
-    squares.forEach(function (s) {
+    /*squares.forEach(function (s:PIXI.Container) {
       this.addChild(s);
-    });
+    });*/
+    this.addChild(squares[0]);
+    this.addChild(squares[1]);
+    this.addChild(squares[2]);
+    this.addChild(squares[3]);
 
 // Listen for animate update
-    app.ticker.add(function (delta) {
+    /*app.ticker.add(function (delta) {
       containerSprite.proj.mapBilinearSprite(containerSprite, quad);
+    });*/
+    /*let comp:ProjectionComponent = new ProjectionComponent();
+    comp.sprite = containerSprite;
+    comp.quad = quad;*/
+    this.addComponent(ProjectionComponent,{
+      'sprite': containerSprite,
+      'quad': quad,
     });
 
-    squares.forEach(function (s) {
-      this.addInteraction(s);
-    });
+    /*squares.forEach(function (s) {
+      addInteraction(s);
+    });*/
+    this.addInteraction(squares[0]);
+    this.addInteraction(squares[1]);
+    this.addInteraction(squares[2]);
+    this.addInteraction(squares[3]);
 
 // let us add sprite to make it more funny
 
-    this.bunny = new PIXI.projection.Sprite2s(new PIXI.Texture.fromImage('required/assets/flowerTop.png'));
+    this.bunny = new PIXI.projection.Sprite2s(this.textureService.getTexture('branch'));
     this.bunny.anchor.set(0.5);
     containerSprite.addChild(this.bunny);
 
-    this.addInteraction(this.bunny);
+    //this.addInteraction(this.bunny);
 
 // === INTERACTION CODE  ===
 
@@ -73,15 +92,11 @@ export class TestElement extends PXElement implements PXInit {
   }
 
   snap(obj):void {
-    if (obj == this.bunny) {
-      obj.position.set(0);
-    } else {
       obj.position.x = Math.min(Math.max(obj.position.x, 0), 400);
       obj.position.y = Math.min(Math.max(obj.position.y, 0), 400);
-    }
   }
 
-  addInteraction(obj):void  {
+  addInteraction(obj:DragSprite):void  {
     obj.interactive = true;
     obj
       .on('pointerdown', this.onDragStart)
@@ -91,7 +106,7 @@ export class TestElement extends PXElement implements PXInit {
   }
 
   onDragStart(event):void  {
-    let obj2 = event.currentTarget;
+    let obj2:DragSprite = event.currentTarget;
     obj2.dragData = event.data;
     obj2.dragging = 1;
     obj2.dragPointerStart = event.data.getLocalPosition(obj2.parent);
@@ -102,19 +117,19 @@ export class TestElement extends PXElement implements PXInit {
   }
 
   onDragEnd(event):void  {
-    var obj = event.currentTarget;
-    if (obj.dragging == 1) {
+    var obj:DragSprite = event.currentTarget;
+    /*if (obj.dragging == 1) {
       this.toggle(obj);
     } else {
       this.snap(obj);
-    }
+    }*/
     obj.dragging = 0;
     obj.dragData = null;
     // set the interaction data to null
   }
 
   onDragMove(event):void  {
-    var obj = event.currentTarget;
+    var obj:DragSprite = event.currentTarget;
     if (!obj.dragging) return;
     var data = obj.dragData; // it can be different pointer!
     if (obj.dragging == 1) {
@@ -133,5 +148,20 @@ export class TestElement extends PXElement implements PXInit {
         obj.dragObjStart.y + (dragPointerEnd.y - obj.dragPointerStart.y)
       );
     }
+  }
+
+
+}
+
+class DragSprite extends PIXI.Sprite{
+  public dragging:number;
+  public dragData:any;
+  public dragObjStart:any;
+  public dragGlobalStart:any;
+  public dragPointerStart:any;
+  constructor() {
+    super();
+    const obj = new PIXI.Sprite();
+    (<any>Object).assign(this, obj);
   }
 }

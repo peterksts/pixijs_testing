@@ -8,7 +8,7 @@ import {TestElement} from './page/test.element';
     BranchService,
   ],
   textures: {
-    'branch': 'assets/textures/branch.png'
+    'branch': {imageUrl: 'assets/textures/branch.png'},
   },
 })
 export class TestModule {}
