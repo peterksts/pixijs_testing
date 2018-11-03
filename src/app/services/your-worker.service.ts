@@ -1,13 +1,15 @@
 export interface CustomWorker {
-  message(data: EventData): void;
-}
-
-export interface CustomWorkerInput {
-  message(e: EventData): Promise<void>;
-  [key: string]: (args?, args2?, args3?, args4?) => Promise<any>;
+  message: (data: EventData) => Promise<void>;
 }
 
 export type EventData = any;
+
+export type TWorkerTools = {
+  postMessage(data: any): void;
+  createWorker<P extends CustomWorker, R extends P & Worker>
+  (model: new() => P, settings?: {[key: string]: any}): R;
+  [key: string]: any;
+}
 
 export class YourWorkerService {
 
@@ -16,11 +18,11 @@ export class YourWorkerService {
   constructor() {
   }
 
-  public createWorker<Function extends new() => P,
-    P extends CustomWorker, R extends CustomWorkerInput & P & Worker>(model: Function): R {
+  public createWorker<P extends CustomWorker, R extends P & Worker>
+  (model: new() => P, settings?: {[key: string]: any}): R {
     const worker = new Worker('assets/workers/your-code.worker.js');
     let anyClass = Object.create(model)['__proto__'].toString();
-    worker.postMessage({object: anyClass});
+    worker.postMessage({object: anyClass, settings});
     const newModel = new model();
     newModel['__proto__']['__cache__promise__'] = {};
     worker.addEventListener('message', ({data}) => {
@@ -49,7 +51,7 @@ export class YourWorkerService {
     return <R>assignModel;
   }
 
-  private merge<P extends CustomWorker, R extends CustomWorkerInput & P & Worker>(model: P, worker: Worker): R {
+  private merge<P, R extends P & Worker>(model: P, worker: Worker): R {
     model['postMessage'] = worker['postMessage'].bind(worker);
     model['terminate'] = worker['terminate'].bind(worker);
     model['addEventListener'] = worker['addEventListener'].bind(worker);

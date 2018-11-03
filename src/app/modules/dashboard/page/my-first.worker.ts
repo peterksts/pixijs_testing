@@ -1,4 +1,5 @@
-import {CustomWorker, EventData} from '../../../services/your-worker.service';
+import {CustomWorker, EventData, TWorkerTools} from '../../../services/your-worker.service';
+const WorkerTools = <TWorkerTools>{};
 
 export class MyFirstWorker implements CustomWorker {
 
@@ -7,24 +8,45 @@ export class MyFirstWorker implements CustomWorker {
   constructor() {
   }
 
-  public message(data: EventData): void {
-    (<any>postMessage)(data);
-  }
-
-  public getIterator = (summer: number, pamer: number): number => {
+  getIterator = async (summer: number, pamer: number): Promise<number> => {
     return this.buildGood(summer) + pamer + this.iterator;
   }
 
-  public hard = (summer: number): number => {
-    let sd = summer;
-    for (let i = 1000000000; i >= 0; i--) {
-      sd += this.buildGood(i);
-    }
-    return sd;
+  hard = async (summer: number): Promise<string> => {
+    return this.parallelWorker.get(summer * 2);
+  }
+
+  message = async (data: EventData) => {
   }
 
   private buildGood(summer: number): number {
     return summer++;
   }
+
+  // Parallel 1 Workers
+  ///////////////////
+  private parallelWorker = WorkerTools.up_1 && WorkerTools.createWorker(class ParallelWorker implements CustomWorker {
+
+    message = async (data: EventData) => {
+    }
+
+    get = async (summer: number): Promise<string> => {
+      return this.parallelWorker.get(summer * 2);
+    }
+
+    // Parallel 1 : 2 Workers
+    /////////////////////
+    private parallelWorker = WorkerTools.up_2 && WorkerTools.createWorker(class ParallelWorker implements CustomWorker {
+
+      message = async (data: EventData) => {
+      }
+
+      get = async (summer: number): Promise<string> => {
+        return `ParallelWorker 2: ${summer * 2}`;
+      }
+
+    });
+
+  }, {'up_2': true});
 
 }
