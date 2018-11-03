@@ -99,4 +99,9 @@ export class PXElement extends PIXI.Container {
     return elem;
   }
 
+  public removeElement(elem: PXElement | any): any {
+    elem.pxOnDelete && elem.pxOnDelete();
+    this.removeChild(elem);
+  }
+
 }

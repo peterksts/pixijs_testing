@@ -3,11 +3,13 @@ import {DashboardElement} from './page/dashboard.element';
 import {BranchService} from './services/branch.service';
 import {ErrorInterceptor} from './services/error.interceptor';
 import {LetRedirectRouterGuard} from './services/let-redirect.router-guard';
+import {YourWorkerService} from '../../services/your-worker.service';
 
 @Module({
   rootElement: DashboardElement,
   provider: [
     BranchService,
+    YourWorkerService,
   ],
   interceptor: [
     ErrorInterceptor,
