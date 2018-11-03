@@ -6,9 +6,7 @@ import {ClickComponent} from '../../dashboard/components/click.component';
 
 export const Metadata: ElementMetadata = {
   components: [
-    {
-      component: ClickComponent,
-    },
+
   ],
   elements: [
     {
