@@ -13,7 +13,7 @@ function massageToBuilt(e) {
 }
 
 function outMessage({response, id}) {
-  if (typeof response.then === 'function') {
+  if (response instanceof Promise) {
      response.then(d => outMessage({response: d, id}));
   } else {
     postMessage({response, id: id});
@@ -34,17 +34,25 @@ WorkerTools = {
   iterator: 0,
 
   createWorker(model, settings) {
+    // build worker
     const worker = new Worker('your-code.worker.js');
     let anyClass = Object.create(model)['__proto__'].toString();
+
+    // initialization of your class in worker
     worker.postMessage({object: anyClass, settings});
+
     const newModel = new model();
     newModel['__proto__']['__cache__promise__'] = {};
+
+    // build promise cache
     worker.addEventListener('message', ({data}) => {
       if (!data) { return; }
       const prom = newModel['__proto__']['__cache__promise__'][data.id];
       prom && prom.resolve(data.response);
       delete newModel['__proto__']['__cache__promise__'][data.id];
     });
+
+    // all class function in bridge: mainThread => Promise => thread => Promise => mainThread;
     const _this = this;
     for (const field in newModel) {
       if (typeof newModel[field] === 'function') {
@@ -61,6 +69,7 @@ WorkerTools = {
         }
       }
     }
+
     const assignModel = this.merge(newModel, worker);
     return assignModel;
   },

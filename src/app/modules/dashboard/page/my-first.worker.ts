@@ -24,7 +24,7 @@ export class MyFirstWorker implements CustomWorker {
   }
 
   // Parallel 1 Workers
-  ///////////////////
+  /////////////////////
   private parallelWorker = WorkerTools.up_1 && WorkerTools.createWorker(class ParallelWorker implements CustomWorker {
 
     message = async (data: EventData) => {
@@ -35,7 +35,7 @@ export class MyFirstWorker implements CustomWorker {
     }
 
     // Parallel 1 : 2 Workers
-    /////////////////////
+    /////////////////////////
     private parallelWorker = WorkerTools.up_2 && WorkerTools.createWorker(class ParallelWorker implements CustomWorker {
 
       message = async (data: EventData) => {

@@ -23,8 +23,12 @@ export class DashboardElement extends PXElement implements PXInit {
   }
 
   private async dataInit() {
-    this.myWorker.hard(10).then(d => console.log(d));
-    this.myWorker.getIterator(10, 1).then(d => console.log(d));
+    const str = await this.myWorker.hard(10);
+    const num = await this.myWorker.getIterator(10, 1);
+    console.log(
+      `good str: ${str}\n` +
+      `good num: ${num}`
+    );
   }
 
 }

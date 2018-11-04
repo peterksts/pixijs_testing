@@ -5,9 +5,9 @@ export interface CustomWorker {
 export type EventData = any;
 
 export type TWorkerTools = {
-  postMessage(data: any): void;
+  postMessage(data: EventData): void;
   createWorker<P extends CustomWorker, R extends P & Worker>
-  (model: new() => P, settings?: {[key: string]: any}): R;
+    (model: new() => P, settings?: {[key: string]: any}): R;
   [key: string]: any;
 }
 
@@ -16,21 +16,33 @@ export class YourWorkerService {
   private iterator = 0;
 
   constructor() {
+    // // Создание виртуальной страницы с кодом воркера
+    // _WSTR: string;
+    // let blob = new Blob([_WSTR]),
+    //     blobURL = window.URL.createObjectURL(blob);
   }
 
   public createWorker<P extends CustomWorker, R extends P & Worker>
   (model: new() => P, settings?: {[key: string]: any}): R {
+    // build worker
     const worker = new Worker('assets/workers/your-code.worker.js');
     let anyClass = Object.create(model)['__proto__'].toString();
+
+    // initialization of your class in worker
     worker.postMessage({object: anyClass, settings});
+
     const newModel = new model();
     newModel['__proto__']['__cache__promise__'] = {};
+
+    // build promise cache
     worker.addEventListener('message', ({data}) => {
       if (!data) { return; }
       const prom = newModel['__proto__']['__cache__promise__'][data.id];
       prom && prom.resolve(data.response);
       delete newModel['__proto__']['__cache__promise__'][data.id];
     });
+
+    // all class function in bridge: mainThread => Promise => thread => Promise => mainThread;
     const _this = this;
     for (const field in newModel) {
       if (typeof newModel[field] === 'function') {
@@ -47,6 +59,7 @@ export class YourWorkerService {
         }
       }
     }
+
     const assignModel = this.merge(newModel, worker);
     return <R>assignModel;
   }
@@ -63,6 +76,7 @@ export class YourWorkerService {
         worker['onmessage'] = value;
       }
     });
+
     return <R>model;
   }
 
