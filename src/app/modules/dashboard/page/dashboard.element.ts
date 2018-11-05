@@ -6,7 +6,7 @@ import {PXElement} from '../../../wrappers/px-element.wrap';
 import {PXInit} from '../../../interfaces/px.interface';
 import {Element} from '../../../decorators/element.decorator';
 import {Inject} from '../../../decorators/Inject.decorator';
-import {YourWorkerService} from '../../../services/your-worker.service';
+import {yourWebWorker} from '../../../services/your-web-worker';
 import {MyFirstWorker} from './my-first.worker';
 
 @Element(Metadata)
@@ -15,8 +15,7 @@ export class DashboardElement extends PXElement implements PXInit {
   @Inject() private textureService: TextureService;
   @Inject() private soundService: SoundService;
   @Inject() private http: HttpClient;
-  @Inject() private yourWorker: YourWorkerService;
-  private myWorker = this.yourWorker.createWorker(MyFirstWorker, {'up_1': true});
+  private myWorker = yourWebWorker.createWorker(MyFirstWorker);
 
   pxOnInit(): void {
     this.dataInit();
