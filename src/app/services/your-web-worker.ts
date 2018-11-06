@@ -30,18 +30,53 @@ class YourWebWorker {
       environmentVariable ? environmentVariable['up_1'] = true : environmentVariable = {'up_1': true};
     }
     const worker = new Worker(this.blobUrl);
-    let anyClass = Object.create(model)['__proto__'].toString();
+    let anyClass: string = Object.create(model)['__proto__'].toString();
     const _this = this;
-
-    // initialization of your class in worker
-    worker.postMessage({object: anyClass, environmentVariable, blobUrl: this.blobUrl});
 
     const newModel = new model();
     newModel['__proto__']['__cache__promise__'] = {};
+    newModel['__proto__']['__subject__blocking__'] = {};
+
+    // all Subject & BehaviorSubject
+    const subjectFields = [];
+    for (const field in newModel) {
+      if (newModel[field] && (<any>newModel[field]).next && (<any>newModel[field]).asObservable) {
+        subjectFields.push(field);
+      }
+    }
+
+    // fix problems with the package manager
+    anyClass = anyClass.replace(new RegExp(
+      `this\\.([a-zA-Z0-9_]+)\\s?=\\s?new\\s[a-zA-Z0-9_]+\\.(Subject)\\(\\)`, 'g'),
+      `this.$1=new Subject(\'$1\')`
+    );
+    anyClass = anyClass.replace(new RegExp(
+      `this\\.([a-zA-Z0-9_]+)\\s?=\\s?new\\s?[a-zA-Z0-9_]+\\.(BehaviorSubject)\\(`, 'g'),
+      `this.$1=new BehaviorSubject(\'$1\', `
+    );
+
+    // initialization of your class in worker
+    worker.postMessage({
+      object: anyClass,
+      environmentVariable,
+      blobUrl: this.blobUrl,
+      subjectFields
+    });
 
     // build promise cache
     worker.addEventListener('message', ({data}) => {
       if (!data) { return; }
+      console.log(data);
+      if (data['__msg__for__subject__'] && data['__field__name__']) {
+        const sub = newModel[data['__field__name__']];
+        if (!sub) { return; }
+
+        const blocking = newModel['__proto__']['__subject__blocking__'];
+        blocking[data['__field__name__']] = true;
+        sub.next(data['__msg__']);
+        return;
+      }
+
       const prom = newModel['__proto__']['__cache__promise__'][data.__id__worker];
       prom && prom.resolve(data.response);
       prom && delete newModel['__proto__']['__cache__promise__'][data.__id__worker];
@@ -63,6 +98,15 @@ class YourWebWorker {
         }
       }
     }
+
+    subjectFields.forEach(f => {
+      newModel[f].asObservable().subscribe(d => {
+        const blocking = newModel['__proto__']['__subject__blocking__'];
+        !blocking[f] && worker.postMessage(
+          {__field__name__: f, __msg__for__subject__: true, __msg__: d});
+        blocking[f] = false;
+      });
+    });
 
     const assignModel = this.merge(newModel, worker);
     return <R>assignModel;
@@ -99,6 +143,7 @@ function buildVirtualPage(): string {
   let thisClass = Object.create(YourWebWorker)['__proto__'].toString();
 
   let _wstr = _WSTR_part_default;
+  _wstr += _WSTR_subject;
   _wstr += `WorkerTools = new ${thisClass}();\n`;
   _wstr += _WSTR_part_functions;
 
@@ -114,9 +159,43 @@ built ? massageToBuilt(e) : init(e.data);
 });
 `;
 
+const _WSTR_subject = `
+const Subject = class BehaviorSubject {
+  constructor(fieldName, v) {
+    this.v = v;
+    this._sub = [];
+    this.fieldName = fieldName;
+  }
+  next(v, stop) {
+    this._sub.forEach(sub => sub(v));
+    !stop && postMessage({__field__name__: this.fieldName, __msg__for__subject__: true, __msg__: v});
+    this.v = v;
+  }
+  asObservable() {
+    return {
+      subscribe: (call) => {
+        this._sub.push(call);
+        return {
+          unsubscribe: () => {
+            const i = this._sub.indexOf(s => s === call);
+            i !== -1 && this._sub.splice(i, 1);
+          }
+        }
+      }
+    };
+  }
+  getValue() { return this.v; }
+};
+const BehaviorSubject = Subject;
+`;
+
 const _WSTR_part_functions = `
 function massageToBuilt(e) {
   const data = e.data;
+  if (data['__msg__for__subject__'] && data['__field__name__']) {
+    built[data['__field__name__']].next(data['__msg__'], true);
+    return;
+  }
   if (data['__is__object__for__fn']) {
     const response = built[data.functionName].apply(built, data.request);
     outMessage({response, __id__worker: data.__id__worker});
@@ -133,7 +212,7 @@ function outMessage({response, __id__worker}) {
   }
 }
 
-function init({ object, environmentVariable, blobUrl }) {
+function init({ object, environmentVariable, blobUrl, subjectFields }) {
   EnvironmentVariable = environmentVariable;
   WorkerTools.blobUrl = blobUrl;
   const anyClass = eval(\`( \${object} )\`);

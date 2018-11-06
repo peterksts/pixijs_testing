@@ -69,7 +69,7 @@ module.exports = {
         modules: {
           test: /\.module.ts?$/,
           name(module) {
-            let packageName = module.context.substr(module.context.search(/[\\/][a-z0-9.\-_]+.js/) + 1, module.context.length - 1);
+            let packageName = module.context.substr(module.context.search(/[\\/]([a-z0-9._\-]+)$/) + 1, module.context.length - 1);
             return `module.${packageName}`;
           },
         }

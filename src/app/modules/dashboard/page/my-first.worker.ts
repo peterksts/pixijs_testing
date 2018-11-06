@@ -1,12 +1,18 @@
 import {CustomWorker, EventData, TWorkerTools} from '../../../services/your-web-worker';
+import {BehaviorSubject, Subject} from 'rxjs';
 declare let WorkerTools: TWorkerTools;
 declare let EnvironmentVariable: {[key: string]: any};
 
 export class MyFirstWorker implements CustomWorker {
 
   private iterator = 1;
+  public chan = new BehaviorSubject<any>({});
 
   constructor() {
+    if (window) { return; } // in web-worker no variable 'window'
+
+    // this.parallelWorker.chan_2.asObservable().subscribe(d => console.log('p2 =>', d));
+    // this.parallelWorker.chan_2.next(78);
   }
 
   getIterator = async (summer: number, pamer: number): Promise<number> => {
@@ -28,6 +34,14 @@ export class MyFirstWorker implements CustomWorker {
   /////////////////////
   private parallelWorker = EnvironmentVariable.up_1 && WorkerTools.createWorker(
     class ParallelWorker implements CustomWorker {
+
+      public chan_2 = new BehaviorSubject<any>({});
+
+      constructor() {
+        if (EnvironmentVariable.up_2) { return; }
+
+        this.chan_2.next('haha)))');
+      }
 
       message = async (data: EventData) => {
       }
