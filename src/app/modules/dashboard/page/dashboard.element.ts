@@ -31,10 +31,10 @@ export class DashboardElement extends PXElement implements PXInit {
     // lpc.asObservable().subscribe();
     // importScripts()
 
-    // this.myWorker.chan.asObservable().subscribe(d => console.log('main thread chan =>>', d));
+    this.myWorker.chan.asObservable().subscribe(d => console.log('main thread chan =>>', d));
 
 
-    const str = await this.myWorker.hard(10);
+    // const str = await this.myWorker.hard(10);
     // const num = await this.myWorker.getIterator(10, 1);
     // console.log(
     //   `good str: ${str}\n` +

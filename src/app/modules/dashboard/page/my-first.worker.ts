@@ -11,8 +11,9 @@ export class MyFirstWorker implements CustomWorker {
   constructor() {
     if (window) { return; } // in web-worker no variable 'window'
 
-    // this.parallelWorker.chan_2.asObservable().subscribe(d => console.log('p2 =>', d));
-    // this.parallelWorker.chan_2.next(78);
+    this.parallelWorker.chan_2.asObservable().subscribe(d => this.chan.next('p2 =>' + d));
+    this.parallelWorker.chan_2.next(78);
+    this.chan.next(12);
   }
 
   getIterator = async (summer: number, pamer: number): Promise<number> => {
@@ -32,15 +33,19 @@ export class MyFirstWorker implements CustomWorker {
 
   // Parallel 1 Workers
   /////////////////////
-  private parallelWorker = EnvironmentVariable.up_1 && WorkerTools.createWorker(
+  private parallelWorker = EnvironmentVariable.__up__ === 1 && WorkerTools.createWorker(
     class ParallelWorker implements CustomWorker {
 
       public chan_2 = new BehaviorSubject<any>({});
 
       constructor() {
-        if (EnvironmentVariable.up_2) { return; }
+        if (EnvironmentVariable.__up__ !== 2) { return; }
 
         this.chan_2.next('haha)))');
+        this.parallelWorker.chan_2.asObservable().subscribe(d => {
+          console.log('cheack of p2 =>>', d);
+        });
+        this.parallelWorker.chan_2.next('good');
       }
 
       message = async (data: EventData) => {
@@ -52,8 +57,19 @@ export class MyFirstWorker implements CustomWorker {
 
       // Parallel 1 : 2 Workers
       /////////////////////////
-      private parallelWorker = EnvironmentVariable.up_2 && WorkerTools.createWorker(
+      private parallelWorker = EnvironmentVariable.__up__ === 2 && WorkerTools.createWorker(
         class ParallelWorker implements CustomWorker {
+
+          constructor() {
+            if (EnvironmentVariable.__up__ !== 3) { return; }
+
+            this.chan_2.asObservable().subscribe(d => {
+              console.log('cheack of p3 =>>', d);
+            });
+            this.chan_2.next('kuku of p3');
+          }
+
+          public chan_2 = new BehaviorSubject<any>({});
 
           message = async (data: EventData) => {
           }
@@ -64,6 +80,6 @@ export class MyFirstWorker implements CustomWorker {
 
       });
 
-  }, {'up_2': true});
+  });
 
 }

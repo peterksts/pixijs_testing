@@ -1,3 +1,6 @@
+declare let WorkerTools: TWorkerTools;
+declare let EnvironmentVariable: {[key: string]: any};
+
 export interface CustomWorker {
   message: (data: EventData) => Promise<void>;
 }
@@ -26,9 +29,10 @@ class YourWebWorker {
     (model: new() => P, environmentVariable?: {[key: string]: any}): R {
     // Build web-worker
     if (!this.blobUrl) { this.blobUrl = buildVirtualPage(); }
-    if (window) {
-      environmentVariable ? environmentVariable['up_1'] = true : environmentVariable = {'up_1': true};
-    }
+    const __up = EnvironmentVariable['__up__'] || 0;
+    environmentVariable ?
+      environmentVariable['__up__'] =  __up + 1 : environmentVariable = { '__up__': __up + 1 };
+
     const worker = new Worker(this.blobUrl);
     let anyClass: string = Object.create(model)['__proto__'].toString();
     const _this = this;
@@ -37,23 +41,32 @@ class YourWebWorker {
     newModel['__proto__']['__cache__promise__'] = {};
     newModel['__proto__']['__subject__blocking__'] = {};
 
+    // fix problems with the package manager
+    anyClass = anyClass.replace(new RegExp(
+      `this\\.([a-zA-Z0-9_]+)\\s?=\\s?new\\s[a-zA-Z0-9_]+\\.(Subject)\\(\\)`, 'g'),
+      `this.$1=new Subject(\'$1\', -1)`
+    );
+    anyClass = anyClass.replace(new RegExp(
+      `this\\.([a-zA-Z0-9_]+)\\s?=\\s?new\\s?[a-zA-Z0-9_]+\\.(BehaviorSubject)\\(`, 'g'),
+      `this.$1=new BehaviorSubject(\'$1\', -1, `
+    );
+
     // all Subject & BehaviorSubject
     const subjectFields = [];
     for (const field in newModel) {
       if (newModel[field] && (<any>newModel[field]).next && (<any>newModel[field]).asObservable) {
         subjectFields.push(field);
       }
-    }
 
-    // fix problems with the package manager
-    anyClass = anyClass.replace(new RegExp(
-      `this\\.([a-zA-Z0-9_]+)\\s?=\\s?new\\s[a-zA-Z0-9_]+\\.(Subject)\\(\\)`, 'g'),
-      `this.$1=new Subject(\'$1\')`
-    );
-    anyClass = anyClass.replace(new RegExp(
-      `this\\.([a-zA-Z0-9_]+)\\s?=\\s?new\\s?[a-zA-Z0-9_]+\\.(BehaviorSubject)\\(`, 'g'),
-      `this.$1=new BehaviorSubject(\'$1\', `
-    );
+      anyClass = anyClass.replace(new RegExp(
+        `this\\.${field}\\s?=\\s?new\\s(Subject)\\('${field}', -1\\)`),
+        `this.$1=new Subject(\'$1\', ${environmentVariable['__up__']})`
+      );
+      anyClass = anyClass.replace(new RegExp(
+        `this\\.${field}\\s?=\\s?new\\s?(BehaviorSubject)\\('${field}', -1, `),
+        `this.${field}=new BehaviorSubject(\'${field}\', ${environmentVariable['__up__']}, `
+      );
+    }
 
     // initialization of your class in worker
     worker.postMessage({
@@ -66,7 +79,7 @@ class YourWebWorker {
     // build promise cache
     worker.addEventListener('message', ({data}) => {
       if (!data) { return; }
-      console.log(data);
+
       if (data['__msg__for__subject__'] && data['__field__name__']) {
         const sub = newModel[data['__field__name__']];
         if (!sub) { return; }
@@ -161,14 +174,17 @@ built ? massageToBuilt(e) : init(e.data);
 
 const _WSTR_subject = `
 const Subject = class BehaviorSubject {
-  constructor(fieldName, v) {
+  constructor(fieldName, up, v) {
     this.v = v;
     this._sub = [];
     this.fieldName = fieldName;
+    this.up = up;
   }
   next(v, stop) {
     this._sub.forEach(sub => sub(v));
-    !stop && postMessage({__field__name__: this.fieldName, __msg__for__subject__: true, __msg__: v});
+    if (!stop && EnvironmentVariable['__up__'] === this.up) {
+      postMessage({__field__name__: this.fieldName, __msg__for__subject__: true, __msg__: v});
+    }
     this.v = v;
   }
   asObservable() {
