@@ -1,5 +1,7 @@
 declare let WorkerTools: TWorkerTools;
 declare let EnvironmentVariable: {[key: string]: any};
+declare let WorkerDependencies: {[key: string]: new () => any};
+declare let WorkerDependenciesS: {[key: string]: string};
 
 export interface CustomWorker {
   message: (data: EventData) => Promise<void>;
@@ -22,16 +24,20 @@ class YourWebWorker {
     if (window) {
       (<any>window).WorkerTools = {};
       (<any>window).EnvironmentVariable = {};
+      (<any>window).WorkerDependencies = {};
+      (<any>window).WorkerDependenciesS = {};
     }
   }
 
   public createWorker<P extends CustomWorker, R extends P & Worker>
-    (model: new() => P, environmentVariable?: {[key: string]: any}): R {
+    (model: new() => P, environmentVariable?: {[key: string]: any}, dependencies?: Array<new() => object>): R {
     // Build web-worker
     if (!this.blobUrl) { this.blobUrl = buildVirtualPage(); }
     const __up = EnvironmentVariable['__up__'] || 0;
     environmentVariable ?
       environmentVariable['__up__'] =  __up + 1 : environmentVariable = { '__up__': __up + 1 };
+
+    const workerDependencies = dependencies ? buildMapDependencies(dependencies) : WorkerDependenciesS;
 
     const worker = new Worker(this.blobUrl);
     let anyClass: string = Object.create(model)['__proto__'].toString();
@@ -43,11 +49,11 @@ class YourWebWorker {
 
     // fix problems with the package manager
     anyClass = anyClass.replace(new RegExp(
-      `this\\.([a-zA-Z0-9_]+)\\s?=\\s?new\\s[a-zA-Z0-9_]+\\.(Subject)\\(\\)`, 'g'),
+      `this\\.([a-zA-Z0-9_]+)\\s?=\\s?new\\s[a-zA-Z0-9_]+\\.Subject\\(\\)`, 'g'),
       `this.$1=new Subject(\'$1\', -1)`
     );
     anyClass = anyClass.replace(new RegExp(
-      `this\\.([a-zA-Z0-9_]+)\\s?=\\s?new\\s?[a-zA-Z0-9_]+\\.(BehaviorSubject)\\(`, 'g'),
+      `this\\.([a-zA-Z0-9_]+)\\s?=\\s?new\\s[a-zA-Z0-9_]+\\.BehaviorSubject\\(`, 'g'),
       `this.$1=new BehaviorSubject(\'$1\', -1, `
     );
 
@@ -56,16 +62,16 @@ class YourWebWorker {
     for (const field in newModel) {
       if (newModel[field] && (<any>newModel[field]).next && (<any>newModel[field]).asObservable) {
         subjectFields.push(field);
-      }
 
-      anyClass = anyClass.replace(new RegExp(
-        `this\\.${field}\\s?=\\s?new\\s(Subject)\\('${field}', -1\\)`),
-        `this.$1=new Subject(\'$1\', ${environmentVariable['__up__']})`
-      );
-      anyClass = anyClass.replace(new RegExp(
-        `this\\.${field}\\s?=\\s?new\\s?(BehaviorSubject)\\('${field}', -1, `),
-        `this.${field}=new BehaviorSubject(\'${field}\', ${environmentVariable['__up__']}, `
-      );
+        anyClass = anyClass.replace(new RegExp(
+          `this\\.${field}\\s?=\\s?new\\sSubject\\('${field}', -1\\)`),
+          `this.${field}=new Subject(\'${field}\', ${environmentVariable['__up__']})`
+        );
+        anyClass = anyClass.replace(new RegExp(
+          `this\\.${field}\\s?=\\s?new\\sBehaviorSubject\\('${field}', -1, `),
+          `this.${field}=new BehaviorSubject(\'${field}\', ${environmentVariable['__up__']}, `
+        );
+      }
     }
 
     // initialization of your class in worker
@@ -73,7 +79,8 @@ class YourWebWorker {
       object: anyClass,
       environmentVariable,
       blobUrl: this.blobUrl,
-      subjectFields
+      subjectFields,
+      workerDependencies
     });
 
     // build promise cache
@@ -164,8 +171,32 @@ function buildVirtualPage(): string {
   return window.URL.createObjectURL(blob);
 }
 
+function buildMapDependencies(dep: Array<new() => object>): {[className: string]: string} {
+  if (!dep || !dep.length) { return null; }
+
+  const dependencies = {};
+  dep.forEach(dep => {
+    let anyClass = Object.create(dep)['__proto__'].toString();
+
+    // fix problems with the package manager
+    anyClass = anyClass.replace(new RegExp(
+      `this\\.([a-zA-Z0-9_]+)\\s?=\\s?new\\s[a-zA-Z0-9_]+\\.Subject\\(\\)`, 'g'),
+      `this.$1=new Subject(\'$1\', -1)`
+    );
+    anyClass = anyClass.replace(new RegExp(
+      `this\\.([a-zA-Z0-9_]+)\\s?=\\s?new\\s?[a-zA-Z0-9_]+\\.BehaviorSubject\\(`, 'g'),
+      `this.$1=new BehaviorSubject(\'$1\', -1, `
+    );
+    dependencies[dep.name] = anyClass;
+  });
+
+  return dependencies;
+}
+
 const _WSTR_part_default = `window = false;
 let built = null;
+let WorkerDependencies = {};
+let WorkerDependenciesS = {};
 EnvironmentVariable = {};
 addEventListener("message", function (e) {
 built ? massageToBuilt(e) : init(e.data);
@@ -173,7 +204,7 @@ built ? massageToBuilt(e) : init(e.data);
 `;
 
 const _WSTR_subject = `
-const Subject = class BehaviorSubject {
+const Subject = class Subject {
   constructor(fieldName, up, v) {
     this.v = v;
     this._sub = [];
@@ -202,7 +233,37 @@ const Subject = class BehaviorSubject {
   }
   getValue() { return this.v; }
 };
-const BehaviorSubject = Subject;
+
+const BehaviorSubject = class BehaviorSubject {
+  constructor(fieldName, up, v) {
+    this.v = v;
+    this._sub = [];
+    this.fieldName = fieldName;
+    this.up = up;
+  }
+  next(v, stop) {
+    this._sub.forEach(sub => sub(v));
+    if (!stop && EnvironmentVariable['__up__'] === this.up) {
+      postMessage({__field__name__: this.fieldName, __msg__for__subject__: true, __msg__: v});
+    }
+    this.v = v;
+  }
+  asObservable() {
+    return {
+      subscribe: (call) => {
+        this._sub.push(call);
+        call(this.v);
+        return {
+          unsubscribe: () => {
+            const i = this._sub.indexOf(s => s === call);
+            i !== -1 && this._sub.splice(i, 1);
+          }
+        }
+      }
+    };
+  }
+  getValue() { return this.v; }
+};
 `;
 
 const _WSTR_part_functions = `
@@ -228,9 +289,13 @@ function outMessage({response, __id__worker}) {
   }
 }
 
-function init({ object, environmentVariable, blobUrl, subjectFields }) {
+function init({ object, environmentVariable, blobUrl, subjectFields, workerDependencies }) {
   EnvironmentVariable = environmentVariable;
   WorkerTools.blobUrl = blobUrl;
+  WorkerDependenciesS = workerDependencies || WorkerDependenciesS;
+  for (const field in WorkerDependenciesS) {
+    WorkerDependencies[field] = eval(\`( \${WorkerDependenciesS[field]} )\`);
+  }
   const anyClass = eval(\`( \${object} )\`);
   built = new anyClass();
 }
